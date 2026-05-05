@@ -179,11 +179,14 @@ dt %>%
 
 + Leituras principais:
 
-* Garland Jr, T., & Adolph, S. C. (1994). Why not to do two-species comparative studies: limitations on inferring adaptation. Physiological Zoology, 67(4), 797-828. (2) Wake, D. B., Wake, M. H., & Specht, C. D. (2011). Homoplasy: from detecting pattern to determining process and mechanism of evolution. science, 331(6020), 1032-1035. Complementares: (1) Uyeda, J. C., Zenil-Ferguson, R., & Pennell, M. W. (2018). Rethinking phylogenetic comparative methods. Systematic Biology, 67(6), 1091-1109. (2) Blomberg, S. P., Garland Jr, T., & Ives, A. R. (2003). Testing for phylogenetic signal in comparative data: behavioral traits are more labile. Evolution, 57(4), 717-745. (3) Uyeda, J. C., Caetano, D. S., & Pennell, M. W. (2015). Comparative analysis of principal components can be misleading. Systematic Biology, 64(4), 677-689. (3) 
+  * Garland Jr, T., & Adolph, S. C. (1994). Why not to do two-species comparative studies: limitations on inferring adaptation. Physiological Zoology, 67(4), 797-828. 
+  * Wake, D. B., Wake, M. H., & Specht, C. D. (2011). Homoplasy: from detecting pattern to determining process and mechanism of evolution. science, 331(6020), 1032-1035. 
 
++ Leituras complementares: 
 
-+ Leituras complementares:
-
+  * Uyeda, J. C., Zenil-Ferguson, R., & Pennell, M. W. (2018). Rethinking phylogenetic comparative methods. Systematic Biology, 67(6), 1091-1109. 
+  * Blomberg, S. P., Garland Jr, T., & Ives, A. R. (2003). Testing for phylogenetic signal in comparative data: behavioral traits are more labile. Evolution, 57(4), 717-745. 
+  * Uyeda, J. C., Caetano, D. S., & Pennell, M. W. (2015). Comparative analysis of principal components can be misleading. Systematic Biology, 64(4), 677-689. (3) 
 
 ### 9. *Evolução de médias fenotípicas II: Métodos comparativos de adaptação e relações fenótipo-ambiente*
 
@@ -191,9 +194,19 @@ dt %>%
 
 + Leituras principais:
 
+  * Scales, J. A., King, A. A., & Butler, M. A. (2009). Running for your life or running for your dinner: what drives fiber-type evolution in lizard locomotor muscles?. The American Naturalist, 173(5), 543-553.  
+  
+  
++ Leitura de cada grupo:
 
+  * Grupo 1: Sol, D., Prego, A., Olivé, L., Genovart, M., Oro, D., & Hernández-Matías, A. (2025). Adaptations to marine environments and the evolution of slow-paced life histories in endotherms. Nature Communications, 16(1), 4265. 
+  
+  * Grupo 2: Hodge, J. R., Adams, D. S., Williams, K. L., Alencar, L. R., Camper, B., Larouche, O., ... & Price, S. A. (2025). Unraveling the Effects of Ecology and Evolutionary History in the Phenotypic Convergence of Fishes. Systematic Biology, 74(6), 881-896.  
+  
++ Leituras complementares: 
 
-+ Leituras complementares:
+  * Tsuboi, M., Sztepanacz, J., De Lisle, S., Voje, K. L., Grabowski, M., Hopkins, M. J., ... & Houle, D. (2024). The paradox of predictability provides a bridge between micro-and macroevolution. Journal of evolutionary biology, 37(12), 1413-1432. 
+  * O’Meara, B. C., & Beaulieu, J. M. (2014). Modelling stabilizing selection: the attraction of Ornstein–Uhlenbeck models. In Modern phylogenetic comparative methods and their application in evolutionary biology: concepts and practice (pp. 381-393). Berlin, Heidelberg: Springer Berlin Heidelberg.
   
   
 ### 10. *Conectando micro- e macroevolução de fenótipos complexos*
@@ -202,10 +215,14 @@ dt %>%
 
 + Leituras principais:
 
+  * Rolland, J., Henao-Diaz, L. F., Doebeli, M., Germain, R., Harmon, L. J., Knowles, L. L., ... &
+Schluter, D. (2023). Conceptual and empirical bridges between micro-and macroevolution.
+Nature Ecology & Evolution, 7(8), 1181-1193. 
 
 
 + Leituras complementares:
-  
+
+  * Machado, F. A., Mongle, C. S., Slater, G., Penna, A. Wisniewski, A., Soffin, A., ... & Uyeda, J.C. (2023). Rules of teeth development align microevolution with macroevolution in extant and extinct primates. Nature Ecology & Evolution, 7(10), 1729-1739.
   
 
 # Tutoriais
