@@ -1,7 +1,7 @@
 ---
 title: "Básico de Álgebra Linear"
-author: "Guilherme Garcia"
-date: "09 de Maio de 2017"
+author: "Guilherme Garcia e Diogo Melo"
+date: "19 de Maio de 2026"
 output:
   html_document:
     code_folding: show
