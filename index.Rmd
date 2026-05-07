@@ -237,9 +237,9 @@ Nature Ecology & Evolution, 7(8), 1181-1193.
 
 **Tutorial 3.2**: [*Modelos Lineares Multivariados*]()
 
-**Tutorial 3.3**: [*Modelos animal univariado*](Tutorial/modelo_animal_uni.html)
+**Tutorial 3.3**: [*Modelos animal univariado*](Tutoriais/modelo_animal_uni.html)
 
-**Tutorial 3.4**: [*Modelos animal bivariado*](Tutorial/modelo_animal_multi.html)
+**Tutorial 3.4**: [*Modelos animal bivariado*](Tutoriais/modelo_animal_multi.html)
 
 **Tutorial 4**: [*Estimando Seleção*](Tutoriais/detectando_modularidade.html)
 

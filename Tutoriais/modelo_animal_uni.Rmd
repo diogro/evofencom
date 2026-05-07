@@ -1,5 +1,5 @@
 ---
-title: "Tutorial do modelo animal univariado"
+title: "Modelo animal univariado"
 author: "Diogo Melo, Alastair Wilson"
 date: "2026-05-06"
 output:
