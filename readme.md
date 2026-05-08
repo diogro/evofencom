@@ -184,28 +184,3 @@ Nature Ecology & Evolution, 7(8), 1181-1193.
   * Machado, F. A., Mongle, C. S., Slater, G., Penna, A. Wisniewski, A., Soffin, A., ... & Uyeda, J.C. (2023). Rules of teeth development align microevolution with macroevolution in extant and extinct primates. Nature Ecology & Evolution, 7(10), 1729-1739.
   
 
-# Tutoriais
-
-<!-- [**Todos os tutoriais em pdf**](Tutoriais/tutoriais_em_pdf.zip) -->
-
-**Tutorial 1**: [*Introdução ao R*](Tutoriais/inicio.html)
-
-**Tutorial 2**: [*Básico de Álgebra Linear*](Tutoriais/algelin.html)
-
-**Tutorial 3.1**: [*Modelos Lineares Uni e Multivariados*]()
-
-**Tutorial 3.2**: [*Modelos Lineares Multivariados*]()
-
-**Tutorial 3.3**: [*Modelos animal univariado*](Tutoriais/modelo_animal_uni.html)
-
-**Tutorial 3.4**: [*Modelos animal bivariado*](Tutoriais/modelo_animal_multi.html)
-
-**Tutorial 4**: [*Estimando Seleção*](Tutoriais/detectando_modularidade.html)
-
-**Tutorial 5**: [*Modelos de Desempenho Funcional*](Tutoriais/selecao.html)
-
-**Tutorial 6**: [*Métodos Comparativos I*](Tutoriais/consequencias_evolutivas.html)
-
-**Tutorial 7**: [*Métodos Comparativos II*](Tutoriais/consequencias_evolutivas.html)
-
-
