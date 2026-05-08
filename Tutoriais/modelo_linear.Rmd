@@ -1,0 +1,147 @@
+---
+title: "Regressão linear simples e multipla"
+author:
+ - "Andrea Sánchez-Tapia"
+ - "Paulinha Lemos-Costa"
+ - "Sara Mortara"
+ - "Diogo Melo"
+date: "2026-05-19"
+output:
+    distill::distill_article:
+      toc: true
+      toc_depth: 3
+---
+
+
+```{r setup, echo=FALSE}
+library(rmarkdown)
+knitr::opts_chunk$set(eval = TRUE)
+# clipboard
+htmltools::tagList(
+  xaringanExtra::use_clipboard(
+    button_text = "Copy code <i class=\"fa fa-clipboard\"></i>",
+    success_text = "Copied! <i class=\"fa fa-check\" style=\"color: #90BE6D\"></i>",
+    error_text = "Not copied 😕 <i class=\"fa fa-times-circle\" style=\"color: #F94144\"></i>"
+  ),
+  rmarkdown::html_dependency_font_awesome()
+  )
+```
+
+# Simple linear models
+
+A regressão linear impõe ou presume que exista uma relação linear entre uma ou mais variáveis preditoras $x_i$ e uma variável resposta $y$.
+
+$$y_i \sim Normal(\mu_i, \sigma) \\
+\mu_i = \alpha + \beta x_i$$
+
+A primeira linha desse modelo descreve a distribuição de probabilidade da variável $y$. Ela pode ser modelada como uma variável com uma distribuição normal, com uma média $\mu$ e um desvio-padrão $\sigma$.
+
+A segunda linha do modelo relaciona as variáveis preditoras X com a média esperada μ (mu), baseada numa relação causal hipotetizada entre X e Y. Nesse caso simples, a relação é linear e pode ser representada por uma linha que é dada pelos parâmetros de intercepto α (alfa) e de inclinação β (beta).
+
+## Gerando um conjunto de dados.
+
+Para esse tutorial introdutório, vamos utilizar dados simulados, de forma que conheçamos a relação real entre as variáveis X e Y.
+
+```{r create_dataset}
+N = 30
+x <- runif(N, 0, 5)
+n <- length(x)
+mu <- 1.2 + 3.5 * x # α = 1.2 e β = 3.5.
+y <- rnorm(N, mean = mu, sd = 3)
+lm_data <- data.frame(x,  mu, y, res = y - mu)
+```
+
+Um gráfico simples para os dados:
+
+```{r plot, fig.asp=1}
+plot(y ~ x, pch = 19)
+```
+
+Como podemos ver no gráfico, parece haver uma relação linear simples entre as duas variáveis, como previsto pela simulação.
+
+## Coeficiente de regressão
+
+Podemos estimar o valor dos parâmetros alfa e beta usando muitos métodos diferentes. O método mais comum é o Ordinary Least Squares (OLS), que produz soluções analíticas para o valor desses dois coeficientes.
+
+O valor do coeficiente beta é dado pela covariância entre X e Y, dividido pela variância de X. E o intercepto alpha é dado pela média de Y menos o produto do valor de beta pela média de X.
+
+$$\widehat{\beta}= \frac{Cov(x, y)}{Var(x)} = \frac{\sum_{i=1}^{n}(x_i-\bar{x})(y_i-\bar{y})}{\sum_{i=1}^{n}(x_i-\bar{x})^2}$$
+
+and 
+
+$$
+\hat{\alpha} = \bar{y} - \hat{\beta}\bar{x} 
+$$
+
+
+```{r beta0 and beta1}
+beta_hat <- sum((x - mean(x)) * (y - mean(y))) / sum((x - mean(x)) ^ 2)
+beta_hat
+
+# This is just the ratio of the covariance between x and y and the variance of x
+cov(x, y) / var(x)
+
+# Since mu = alpha + beta*x: 
+alpha_hat <- mean(y) - beta_hat * mean(x)
+alpha_hat
+```
+
+Usando esse valor dos parâmetros, podemos incluir a retro-regressão no gráfico que fizemos acima.
+
+```{r OLS, fig.asp=1}
+plot(y ~ x, pch = 19)
+abline(a = alpha_hat, b = beta_hat, col = 2, lwd = 2)
+```
+
+## Usando a função lm() para ajustar o modelo
+
+Claro que não precisamos calcular os parâmetros diretamente. Podemos usar uma função do R para ajustar esse modelo linear. Essa função é a função "lm" e pode ser chamada usando a sintaxe de fórmula do R.
+
+```{r}
+m1 = lm(y ~ x)
+m1
+```
+
+Com o modelo ajustado, podemos usar a função "summary" para ver as estimativas dos coeficientes, que devem ser idênticas às que obtivemos acima, e também a sua significância e várias outras informações úteis.
+
+```{r}
+summary(m1)
+```
+
+## Variáveis preditoras discretas
+
+Caso a variável preditora X não seja contínua, o modelo linear pode ser usado da mesma maneira. Vamos simular dados em que a variável resposta Y represente o peso de um indivíduo e a variável X seja o estado nutricional: bem alimentado ou mal alimentado.
+
+```{r}
+set.seed(1)
+# 1. Criar a variável preditora X (Categórica)
+n <- 100
+estado_nutricional <- sample(c("bem_alimentado", "mal_alimentado"), n, replace = TRUE)
+peso_medio_por_classe = c("bem_alimentado" = 75, "mal_alimentado" = 60)
+peso <- peso_medio_por_classe[estado_nutricional] + rnorm(n, mean = 0, sd = 5)
+
+# Criar o dataframe
+dados <- data.frame(peso, estado_nutricional)
+head(dados)
+```
+
+Agora vamos ajustar um modelo linear e tentar capturar a diferença nas médias nessas duas classes.
+
+```{r}
+m2 = lm(peso ~ estado_nutricional)
+summary(m2)
+```
+
+Nesse caso, o modelo retorna um coeficiente que nós chamamos de um contraste, mostrando a diferença na média entre os indivíduos bem alimentados e mal alimentados. Os indivíduos mal alimentados tendem a ser aproximadamente 15 kg mais leves que os bem alimentados.
+
+```{r, message = FALSE, warning = FALSE}
+# install.packages( "ggplot2") # se necessario...
+library(ggplot2)
+
+ggplot(dados, aes(estado_nutricional, peso, color = estado_nutricional)) + geom_boxplot() + geom_jitter(width = 0.1)  
+```
+
+O coeficiente beta representa a diferença na média desses dois conjuntos de observações.
+
+# Regressão multipla
+
