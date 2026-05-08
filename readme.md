@@ -29,36 +29,6 @@ O link "Atividades Preparatórias" oferece um introdução da linguagem.
 
 [Apostila de biologia evolutiva](https://github.com/lem-usp/apostila-bio-evol/blob/master/apostila-Bio312.pdf?raw=true)
 
-# Cronograma
-
-```{r, echo=FALSE, warning=FALSE, message=FALSE}
-if(!require(knitr)){install.packages("knitr"); library(knitr)}
-if(!require(kableExtra)){install.packages("kableExtra"); library(kableExtra)}
-dt = data.frame(Dias = paste(rep(c("Segunda", 
-                                   "Terça", 
-                                   "Quarta", 
-                                   "Quinta", 
-                                   "Sexta"), each = 2), c("Manhã", "Tarde")),
-                Aula =c("Origem, manutenção e organização de variação", "Arquitetura Genética de fenótipos complexos",
-                        "Homologia e Mensuração", "Caracterização de variação multidimensional",
-                        "Fenótipos moleculares e mapeamento genético", "Paisagem adaptativa fenotípica e seleção natural",
-                        "Fenótipos complexos e função", "Evolução de médias fenotípicas I: Introdução aos métodos comparativos filogenéticos", 
-                        "Evolução de médias fenotípicas: Métodos comparativos de adaptação e relações fenótipo-ambiente", "Conectando micro- e macroevolução de fenótipos complexos"),
-                Tutorial = c("Roda de conversa basico de Evolução", "Introdução ao R - Plantão de Dúvidas",
-                             "Introdução à Algebra Linear", "Modelos Lineares Simples e Múltiplos",
-                             "Q&A", "Estimando Seleção",
-                             "Tutorial de Modelos de Desempenho Funcional",
-                             "Métodos Comparativos", "Métodos Comparativos", "Discussão final"),
-                Ministrante = c("Monique", "Diogo",
-                                "Diogo/Vinicius", "Diogo/Monique",
-                                "Diogo", "Diogo/Monique",
-                                  "Monique", "Vinicius", "Vinicius", "Diogo/Monique"))
-
-                
-dt %>%
-  kable() %>%
-  kable_styling(bootstrap_options = "striped", full_width = F)
-```
 
 # Aulas Teóricas
 
