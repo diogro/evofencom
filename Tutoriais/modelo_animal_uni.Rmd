@@ -62,19 +62,19 @@ knitr::opts_chunk$set(echo = TRUE)
 
 # Efeitos genéticos e ambientais no tamanho de esquilos
 
-Imagine que um estudo com esquilos tenha mostrado que animais maiores possuem maior aptidão (fitness) — eles têm, em média, maior probabilidade de sobreviver e/ou se reproduzir. Assim, o tamanho dos esquilos está sob seleção positiva, mas será que ele irá evoluir e, em caso afirmativo, quão rápido? A resposta depende da medida em que a variação de tamanho provém de efeitos genéticos versus efeitos ambientais (por exemplo, variação na capacidade de forrageamento).
+Imagine que um estudo com esquilos tenha mostrado que animais maiores possuem maior aptidão (fitness) — eles têm, em média, maior probabilidade de sobreviver e/ou se reproduzir. Assim, o tamanho dos esquilos está sob seleção positiva, mas será que ele irá evoluir e, em caso afirmativo, quão rápido? A resposta depende da medida em que a variação de tamanho provém de efeitos genéticos vs. efeitos ambientais (por exemplo, variação na capacidade de forrageamento).
 
-Imagine que temos uma amostra de 500 esquilos capturados no campo, medidos e com amostras de DNA coletadas. As relações familiares (ou seja, o pedigree) foram determinadas por meio da genotipagem de um conjunto de marcadores moleculares. O pedigree abrange duas gerações (100 pais, 400 descendentes). Medidas de qualidade do forrageamento no local de coleta de cada indivíduo também foram coletados.
+Imagine que temos uma amostra de 500 esquilos capturados no campo, medidos e com amostras de DNA coletadas. As relações familiares (ou seja, o pedigree) foram determinadas por meio da genotipagem de um conjunto de marcadores moleculares. O pedigree abrange duas gerações (100 pais, 400 descendentes). Medidas de qualidade do forrageamento no local de coleta de cada indivíduo também foram feitas.
 
 ```{r}
-voles<-read.table("voles2.txt", header=T)
-voles$ID<-as.factor(voles$ID)
-voles$sex<-as.factor(voles$sex)
-voles$SIRE<-as.factor(voles$SIRE)
-voles$DAM<-as.factor(voles$DAM)
+squirels<-read.table("squirels2.txt", header=T)
+squirels$ID<-as.factor(squirels$ID)
+squirels$sex<-as.factor(squirels$sex)
+squirels$SIRE<-as.factor(squirels$SIRE)
+squirels$DAM<-as.factor(squirels$DAM)
 
 #read in the pedigree file
-volesPED<-read.table("volesPED.txt",header=T)
+squirelsPED<-read.table("squirelsPED.txt",header=T)
 ```
 
 ```{r, attr.message=FALSE, message=FALSE}
@@ -96,8 +96,8 @@ library(pedigreemm)
 Vamos dar uma olhada na estrutuda dos dados:
 
 ```{r}
-head(voles)
-head(volesPED)
+head(squirels)
+head(squirelsPED)
 ```
 
 Espero que isso seja autoexplicativo! Você pode incluir informações sobre o pai (SIRE) e a mãe (DAM) no arquivo de dados principal (como foi feito aqui), embora, por diversos motivos, seja frequentemente mais conveniente ter também um arquivo de dados de pedigree separado ao executar modelos animais (animal models).
@@ -122,7 +122,7 @@ Note que, de forma confusa, o comando anova no R é usado genericamente para com
 
 ```{r}
 #6. Run an ANOVA
-mod_aov<-aov(size~SIRE, data=voles, na.action=na.omit) 
+mod_aov<-aov(size~SIRE, data=squirels, na.action=na.omit) 
                       # this will drop parental generation for us since they have missing SIRE
 summary(mod_aov)  
 ```
@@ -131,13 +131,12 @@ O efeito do pai (sire) é estatisticamente significativo, o que significa que ex
 
 ## Modelo sire-dam ajustado por REML
 
-Primeiro, usaremos o lme4 como um pacote genérico para ajustar modelos mistos simples (ou seja, modelos em que os fatores aleatórios possuem observações repetidas) por REML. Assim, podemos ajustar o pai (sire) como um efeito aleatório sobre o tamanho, resumir o modelo para ver a estimativa de $V_{sire}$ e testar sua significância usando um teste de razão de verossimilhança (likelihood ratio test).
+Primeiro, usaremos o lme4 como um pacote genérico para ajustar modelos mistos simples (ou seja, modelos em que os fatores aleatórios possuem observações repetidas) por REML. Assim, podemos ajustar o pai (sire) como um efeito aleatório sobre o tamanho, consultar o summary do modelo para ver a estimativa de $V_{sire}$ e testar sua significância usando um teste de razão de verossimilhança (likelihood ratio test, LRT).
 
 ```{r}
 #8. Mixed model with SIRE as random
-voles_nosires = na.omit(voles)
-mod_sire<-lmer(size~(1|SIRE), data=voles_nosires) 
-                         #note parents will be kicked out still due to unknown SIRES
+squirels_nosires = na.omit(squirels) # Omitindo observações sem fenótipos
+mod_sire<-lmer(size~(1|SIRE), data=squirels_nosires) 
 
 summary(mod_sire)
 rand(mod_sire)            #this will test significance of random effects using LRT
@@ -153,38 +152,33 @@ Lembrando que este é um estudo de campo no qual os fatores ambientais não pude
 
 ```{r}
 #9. Look at the data
-plot(voles$forage, voles$size)
-plot(voles$sex, voles$size)  #sex 1 is female, 2 is male
+plot(squirels$forage, squirels$size, pch = 19)
+plot(squirels$sex, squirels$size)  #sex 1 is female, 2 is male
 ```
 
 Nenhuma relação muito clara entre essas duas variáveis e tamanho corporal, mas vamos incluí-las como efeitos fixos e testar formalmente a relação entre essas variáveis preditores e a variável resposta. Vamos também incluir um efeito randômico adicional relacionado às mães. Nós sempre podemos simplificar o modelo depois.
 
 ```{r}
 #10. A SIRE-DAM MODEL 
-voles_nosires = na.omit(voles)
-mod_sire_dam<-lmer(size~sex+forage+ (1|SIRE)+(1|DAM), data=voles_nosires) 
-        #note parents will be kicked out still due to unknown SIRES and DAMS
+squirels_nosires = na.omit(squirels) #  omitindo observações sem fenótipo. 
+mod_sire_dam<-lmer(size~sex+forage+ (1|SIRE)+(1|DAM), data=squirels_nosires) 
 rand(mod_sire_dam)
 ```
 
 
-O summary do modelo revela que as variações de pais e mães são de tamanho parecido, e que os efeitos fixos são pequenos, porém significativos.
+O summary do modelo revela que as variâncias de pais e mães são parecidas, e que os efeitos fixos são pequenos, porém significativos.
+
 ```{r}
 summary(mod_sire_dam)
 ```
-
-Sometimes using a sire-dam model you find that Vdam is much bigger than Vsire. This can indicate important dominance or maternal effect contributions. In this case the simulatiion parameters included additive effects only, so I was expecting the two variances to be similar.
 
 Às vezes, usando um modelo desse tipo, chamado SIRE-DAM Model, você pode achar que a variância de DAMS é muito maior que a variância de SIRE. Isso indica contribuição importante de efeitos de dominância ou de efeitos maternos, ambos contribuindo para a variância do fenótipo.
 
 # Calculando a herdabilidade $h^2$
 
-Remembering that for this breeding design Vsire=0.25VA and that total phenotypic variance VP can be defined (conditional on fixed effects) as the sum of all variance components, we can calculate an estimate of heritability:
-
-Nesse desenho experimental, a variância associada aos pais, a SIRE variance, é um quarto da variância genética aditiva ($v_{sire} = 0.25 \times V_A$). A variância total é a soma de todas as variâncias. Nós podemos usar esses dois fatos pra calcular uma estimativa da herdabilidade. 
+Nesse desenho experimental, a variância associada aos pais, a SIRE variance, é um quarto da variância genética aditiva ($v_{sire} = 0.25 \times V_A$, você consegue imaginar por que?). A variância total é a soma de todas as variâncias. Nós podemos usar esses dois fatos pra calcular uma estimativa da herdabilidade. 
 
 ```{r}
-#11. Calculate h2
 #11. Calculate h2
 h2_sire_dam=(4*1.0155)/(0.8224+1.0155+3.4693)
 h2_sire_dam |> round (2)
@@ -203,20 +197,16 @@ Portanto, por enquanto, usaremos um pacote chamado pedigreemm, que faz interface
 
 O pedigreemm precisa que o objeto do pedigree seja separado nos dados fenotípicos, num formato levemente diferente do que nós temos usado. Depois de ajustar o pedigree, podemos ajustar o modelo animal, mantendo os mesmos efeitos fixos que usamos anteriormente, mas substituindo os efeitos aleatórios de SIRE e DAM com um efeito associado ao ID de cada indivíduo e ponderado pelo pedigree.
 
-needs a pedigree file separate from the main data file, but in a slightly different format to the one we have. So we’ll restructure the file a little. Then we fit the animal model, keeping fixed effects as above, but replacing the random effects SIRE and DAM with an effect of the focal individual’s own genes (i.e. its breeding value). This is done by fitting ID in the model, but linking it to the pedigree structure.
-
 ```{r}
 #13.Animal model in pedigreemm
-volesPED2<-pedigree(volesPED$SIRE,volesPED$DAM,volesPED$ID)  #restructure ped file
+squirelsPED2<-pedigree(squirelsPED$SIRE,squirelsPED$DAM,squirelsPED$ID)  #restructure ped file
 
-mod_animalREML<-pedigreemm(size~sex+forage+(1|ID),pedigree=list(ID=volesPED2), 
-                   data=voles, REML=TRUE, 
+mod_animalREML<-pedigreemm(size~sex+forage+(1|ID),pedigree=list(ID=squirelsPED2), 
+                   data=squirels, REML=TRUE, 
                    control=lmerControl(check.nobs.vs.nlev="ignore",
                                        check.nobs.vs.nRE="ignore"))
 summary(mod_animalREML)
 ```
-
-The ID variance is now a direct estimate of the variance in breeding values, that is the additive genetic variance VA. We can calculate the heritability estimate (conditional on fixed effects) as:
 
 A variância associada ao ID agora é uma estimativa direta da variância genética aditiva, e podemos calcular a herdabilidade simplesmente dividindo a variância aditiva pela variância total.
 

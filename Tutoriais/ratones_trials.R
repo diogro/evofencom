@@ -3,8 +3,8 @@ ratones <- read.table("https://raw.githubusercontent.com/diogro/evofencom/refs/h
 pak::pkg_install("diogro/ratones")
 rgl.useNULL = TRUE
 library(ratones)
-traits = names(ratones)[12:46]
 
+traits = names(ratones)[12:46]
 f = paste0("cbind(", paste(traits, collapse = ","), ") ~ SEX + line") 
 cov_mat = lm(as.formula(f), data = ratones) |> CalculateMatrix()
 
@@ -29,8 +29,8 @@ cor_raw["NSL_NA", "IS_PNS"]
 
 library(ggplot2)
 
-ggplot(ratones, aes(NSL_NA, IS_PNS, color = SEX, shape = line)) + 
-  geom_point() + scale_color_manual(values = 1:2) + theme_classic()
+ggplot(ratones, aes(NSL_NA, IS_PNS, color = SEX, shape = line, group = line)) + 
+  geom_point() + stat_ellipse() + scale_color_manual(values = 1:2) + theme_classic()
 
 ratones_residuals = ratones
 ratones_residuals[,traits] = residuals(lm(as.formula(f), data = ratones))

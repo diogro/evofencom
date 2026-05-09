@@ -156,7 +156,7 @@ summary(model_uni)
  
 Acima, vemos as estimativas da variança associada aos efeitos genéticos no termo "animal", a variança residual no termo "units", e estimativas dos efeitos fixos associados ao efeito de sexo e forragamento. Todas essas estimativas acompanham intervalos de confiança que podem ser usados para teste de hipótese.
 
-# Estimando a durabilidade para agressividade
+# Estimando a herdabilidade para agressividade
 
 Uma vantagem grande de modelos bayesianos é que temos uma distribuição posterior e completa para os parâmetros. Portanto, é trivial calcular tanto a herdabilidade quanto o intervalo de confiança da herdabilidade, usando o resultado desse modelo.
 
