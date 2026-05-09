@@ -233,7 +233,7 @@ Nature Ecology & Evolution, 7(8), 1181-1193.
 
 **Tutorial 2**: [*Básico de Álgebra Linear*](Tutoriais/algelin.html)
 
-**Tutorial 3.1**: [*Regressão linear simples e múltipla*](Tutoriais/regressao_linear.html)
+**Tutorial 3.1**: [*Regressão linear simples e múltipla*](Tutoriais/modelo_linear.html)
 
 **Tutorial 3.2**: [*Modelos animal univariado*](Tutoriais/modelo_animal_uni.html)
 
