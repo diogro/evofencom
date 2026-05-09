@@ -143,5 +143,85 @@ ggplot(dados, aes(estado_nutricional, peso, color = estado_nutricional)) + geom_
 
 O coeficiente beta representa a diferença na média desses dois conjuntos de observações.
 
-# Regressão multipla
+# Regressão múltipla
 
+Nós podemos estender a regressão linear para mais de uma variável preditora. Nesse caso, a média esperada de Y é uma função linear de mais de uma variável X.
+
+$$y_i \sim Normal(\mu_i, \sigma) \\
+\mu_i = \alpha + \sum \beta_j x_{ij}$$
+
+## Relação entre regressão múltipla e simples
+
+A relação entre os coeficientes da regressão múltipla e da regressão simples depende da relação entre as variáveis X. Quando as variáveis X são não correlacionadas, os coeficientes da regressão múltipla e da regressão simples são idênticos.
+
+Vamos fazer um exemplo simulado para entender isso. Primeiro, vamos simular duas variáveis preditoras não correlacionadas, chamadas x e z.
+
+```{r}
+set.seed(1)
+n = 100
+# Duas preditoras, x e z
+x = rnorm(n)
+z = rnorm(n)
+
+# y é função de x e z.
+a = 1; b_x = 1.35; b_z = 3.5
+y = a + b_x * x + b_z * z + rnorm(n)
+```
+
+Primeiro, vamos olhar para os coeficientes das regressões simples, de y em x, depois de y em z.
+
+```{r}
+lm(y ~ x) |> coefficients() |> round(2)
+lm(y ~ z) |> coefficients() |> round(2)
+```
+
+Os valores dos coeficientes de X e Z são muito parecidos com os valores simulados.
+
+Finalmente, vamos olhar para os coeficientes da regressão múltipla, ajustando coeficientes para X e Y simultaneamente.
+
+```{r}
+lm(y ~ x + z) |> coefficients() |> round(2)
+```
+
+## Preditores correlacionados na regressão múltipla
+
+A situação muda quando os preditores são correlacionados. Vamos simular um exemplo em que X e Z são ambos causados por uma mesma variável não observada U.
+
+```{r}
+set.seed(2)
+n = 100
+u = rnorm(n)
+
+# X e Z são funções de o?
+x = 1 + 0.5 * u + rnorm(n)
+z = 3 + 2   * u + rnorm(n)
+
+# y é função de x e z.
+a = 1; b_x = 1.35; b_z = 3.5
+y = a + b_x * x + b_z * z + rnorm(n)
+```
+
+Agora, vamos novamente olhar para os coeficientes da regressão simples de Y em X e de Y em Z.
+
+```{r}
+lm(y ~ x) |> coefficients() |> round(2)
+lm(y ~ z) |> coefficients() |> round(2)
+```
+
+Veja como agora os coeficientes da regressão simples são completamente diferentes dos coeficientes que usávamos para fazer a simulação ($b_x = 1.35$; $b_z = 3.5$). 
+
+Mas, se incluirmos tanto o X quanto o Z na regressão, conseguimos recuperar esses valores simulados.
+
+```{r}
+lm(y ~ x + z) |> coefficients() |> round(2)
+```
+
+## Controlando efeitos espúrios
+
+Essas propriedades da regressão múltipla são usadas no contexto de genética quantitativa para remover fontes de variação que não são relevantes para o estudo em questão.
+
+Vamos usar um exemplo com dados reais, medidas cranianas de 5 populações experimentais de camundongos (https://onlinelibrary.wiley.com/doi/full/10.1111/evo.13304).
+
+```{r}
+read.table()
+```
