@@ -67,14 +67,14 @@ Imagine que um estudo com esquilos tenha mostrado que animais maiores possuem ma
 Imagine que temos uma amostra de 500 esquilos capturados no campo, medidos e com amostras de DNA coletadas. As relações familiares (ou seja, o pedigree) foram determinadas por meio da genotipagem de um conjunto de marcadores moleculares. O pedigree abrange duas gerações (100 pais, 400 descendentes). Medidas de qualidade do forrageamento no local de coleta de cada indivíduo também foram feitas.
 
 ```{r}
-squirels<-read.table("squirels2.txt", header=T)
+squirels<-read.table("https://raw.githubusercontent.com/diogro/evofencom/refs/heads/main/Tutoriais/squirels2.txt", header=T)
 squirels$ID<-as.factor(squirels$ID)
 squirels$sex<-as.factor(squirels$sex)
 squirels$SIRE<-as.factor(squirels$SIRE)
 squirels$DAM<-as.factor(squirels$DAM)
 
 #read in the pedigree file
-squirelsPED<-read.table("squirelsPED.txt",header=T)
+squirelsPED<-read.table("https://raw.githubusercontent.com/diogro/evofencom/refs/heads/main/Tutoriais/squirelsPED.txt",header=T)
 ```
 
 ```{r, attr.message=FALSE, message=FALSE}

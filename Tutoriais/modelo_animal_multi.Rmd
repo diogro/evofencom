@@ -1,6 +1,8 @@
 ---
 title: "Modelo animal bivariado"
-author: "Diogo Melo, Alastair Wilson"
+author: 
+  - Diogo Melo
+  - Alastair Wilson
 date: "2026-05-06"
 output:
   html_document:
@@ -60,8 +62,7 @@ h5,h6{
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-# Genetic basis of aggression-size relationship in voles
-
+# Base genética da relação agressividade-tamanho em esquilos
 
 
 Agora sabemos que o tamanho dos esquilos é herdável, além de estar sob seleção positiva, de modo que a evolução para um tamanho maior é prevista sob modelos simples (equação do criador univariada). No entanto, a seleção no tamanho corporal pode ter consequências evolutivas para outros aspectos do fenótipo, dependendo de estarem ou não geneticamente correlacionados. Aqui, testaremos se existe uma base genética para a (hipotetizada) covariância entre tamanho corporal e agressividade. A priori, poderíamos esperar que essas características covariem positivamente em nível fenotípico se (i) indivíduos agressivos forem capazes de conquistar mais recursos alimentares em competição (e, assim, crescerem mais rápido) e/ou (ii) a expressão da agressividade em relação a conespecíficos for mediada pelo tamanho relativo (ou seja, indivíduos maiores podem se dar ao luxo de agir agressivamente contra rivais menores, pois correm menor risco de ferimentos caso um conflito se agrave).
@@ -74,14 +75,14 @@ Antes de qualquer coisa, precisamos carregar os arquivos com os dados que vamos 
 
 ```{r}
 #1. read in the main data file
-voles<-read.table("voles2.txt", header=T)
-voles$ID<-as.factor(voles$ID)
-voles$sex<-as.factor(voles$sex)
-voles$SIRE<-as.factor(voles$SIRE)
-voles$DAM<-as.factor(voles$DAM)
+squirels<-read.table("https://raw.githubusercontent.com/diogro/evofencom/refs/heads/main/Tutoriais/squirels2.txt", header=T)
+squirels$ID<-as.factor(squirels$ID)
+squirels$sex<-as.factor(squirels$sex)
+squirels$SIRE<-as.factor(squirels$SIRE)
+squirels$DAM<-as.factor(squirels$DAM)
 
 #read in the pedigree file
-volesPED<-read.table("volesPED.txt",header=T)
+squirelsPED<-read.table("https://raw.githubusercontent.com/diogro/evofencom/refs/heads/main/Tutoriais/squirelsPED.txt",header=T)
 ```
 
 Vamos também carregar os pacotes que vamos usar.
@@ -105,8 +106,8 @@ Vale a pena fazer um gráfico com os valores de agressividade e tamanhoe para ve
 
 ```{r}
 #3. Test for size-aggression relationship
-mod_regression<-lm(voles$aggression~voles$size) # data=voles)
-plot(voles$size,voles$aggression)               #quick plot in base graphics
+mod_regression<-lm(aggression~size, data=squirels)
+plot(squirels$size,squirels$aggression, pch = 19)           
 abline(mod_regression)
 ```
 
@@ -120,16 +121,16 @@ summary(mod_regression)
 Poderíamos também olhar pra uma regressão múltipla, incluindo os efeitos de tamanho e forrageamento, que talvez expliquem a relação entre essas duas variáveis.
 
 ```{r}
-summary(lm(aggression~size+sex+forage, data=voles))
+summary(lm(aggression~size+sex+forage, data=squirels))
 ```
 
-A partir desse modelo, você poderia concluir que forrageadores melhores são, na verdade, menos agressivos quando condicionamos em tamanho e sexo; e que existe uma relação positiva entre tamanho e agressividade, mesmo quando condicionamos por sexo. Mas será que essa relação fenotípica que observamos é devida a efeitos genéticos? Vamos testar essa hipótese usando um modelo animal bivariado no pacote MCMCglmm.
+A partir desse modelo, você poderia concluir que forrageadores melhores são, na verdade, menos agressivos quando condicionamos por tamanho e sexo; e que existe uma relação positiva entre tamanho e agressividade, mesmo quando condicionamos por sexo. Mas será que essa relação fenotípica que observamos é devida a efeitos genéticos? Vamos testar essa hipótese usando um modelo animal bivariado no pacote MCMCglmm.
 
 # Modelo animal no MCMCglmm
 
-O MCMCglmm é um método bayesiano — precisamos especificar as distribuições a priori (priors) ou permitir que o pacote utilize seus próprios padrões. De certa forma, podemos querer evitar o uso de priors aqui, pois gostaríamos que toda a informação da nossa análise viesse dos nossos dados. Portanto, não estamos sendo verdadeiramente bayesianos no sentido filosófico, apenas aproveitando o MCMC como uma forma de obter nossas estimativas de parâmetros. A especificação de priors é uma questão complexa e não entraremos em detalhes aqui. As notas do curso de MCMCglmm de Jarrod Hadfield fornecem muito mais informações e a explicação definitiva (uma leitura OBRIGATÓRIA se você deseja trabalhar com este pacote).
+O MCMCglmm é um método bayesiano — precisamos especificar as distribuições a priori (priors) ou permitir que o pacote utilize seus priors padrão. A especificação de priors é uma questão complexa e não entraremos em detalhes aqui. As notas do curso de MCMCglmm de Jarrod Hadfield fornecem muito mais informações e a explicação completa dos parametros e opções disponíveis (uma leitura OBRIGATÓRIA se você deseja trabalhar com este pacote). Se você quiser saber mais MESMO, paga uma cerveja pro Diogo.
 
-Vamos executar um modelo bivariado, mas, apenas para ver como o mcmcglmm funciona, vamos rodar primeiro um modelo univariado para a agressividade para verificar se ela é herdável (se não for, fará pouco sentido estimar uma correlação genética com o tamanho).
+Vamos executar um modelo bivariado, mas, apenas para ver como o MCMCglmm funciona, vamos rodar primeiro um modelo univariado para a agressividade para verificar se ela é herdável (se não for, faz pouco sentido estimar uma correlação genética com o tamanho).
 
 ```{r}
 #4. Univariate animal models in mcmcglmm
@@ -140,12 +141,12 @@ prior_uni <- list(G = list(G1 = list(V = 1, nu = 0.002)),
 
 #I think the package likes to reserve ID for an identity matrix so we’ll duplicate 
 #our identity column and call it “animal” in the data file 
-voles$animal<-as.factor(voles$ID)
+squirels$animal<-as.factor(squirels$ID)
 
 #then run the model
 
-model_uni <- MCMCglmm(aggression ~ 1+sex+forage, random = ~animal, pedigree = volesPED,
-            data = voles, prior = prior_uni)
+model_uni <- MCMCglmm(aggression ~ 1+sex+forage, random = ~animal, pedigree = squirelsPED,
+            data = squirels, prior = prior_uni)
 ```
 
 Novamente, usamos a função summary para obter os resultados do modelo.
@@ -156,7 +157,7 @@ summary(model_uni)
  
 Acima, vemos as estimativas da variança associada aos efeitos genéticos no termo "animal", a variança residual no termo "units", e estimativas dos efeitos fixos associados ao efeito de sexo e forragamento. Todas essas estimativas acompanham intervalos de confiança que podem ser usados para teste de hipótese.
 
-# Estimando a herdabilidade para agressividade
+# Estimando a herdabilidades para agressividade
 
 Uma vantagem grande de modelos bayesianos é que temos uma distribuição posterior e completa para os parâmetros. Portanto, é trivial calcular tanto a herdabilidade quanto o intervalo de confiança da herdabilidade, usando o resultado desse modelo.
 
@@ -165,7 +166,7 @@ Uma vantagem grande de modelos bayesianos é que temos uma distribuição poster
 posterior.heritability<-model_uni$VCV[,1]/(model_uni$VCV[,1]+ model_uni$VCV[,2])
 ```
 
-Você pode olhar pra essa distribuição a posteriori dos valores de durabilidade usando um histograma, ou usar a média ou a mediana como uma estimativa da durabilidade, e usar essa distribuição para obter intervalo de confiança.
+Você pode olhar pra essa distribuição a posteriori dos valores de herdabilidade usando um histograma, ou usar a média ou a mediana como uma estimativa da herdabilidade, e usar essa distribuição para obter intervalo de confiança.
 (Um cuidado necessário é que a herdabilidade neste modelo é restrita a valores positivos. Então, o intervalo de confiança nunca vai interceptar o zero e, portanto, não pode ser usado para um teste de hipótese clássico.)
 
 ```{r}
@@ -189,9 +190,7 @@ Embora os pontos acima sejam extremamente importantes para análises reais que s
 plot(model_uni$Sol)   #plots traces and posterior distributions of fixed effects
 ```
 
-In the trace plots we are looking for consistent variation around a stable mean. Ideally the density plots show a clean unimodal (and roughly Gaussian) distribution. Take a look at the plots for the variance component estimates too.
-
-Nos três plots, o ideal é ver uma variação totalmente aleatória ao redor de uma média, e que não tenha nenhum ponto em que os valores fiquem estagnados em um único valor ou saltos entre valores médios diferentes. Da mesma forma, nos gráficos de densidade, o ideal é que tenhamos uma distribuição que se pareça com uma gaussiana, com apenas um valor máximo.
+Nos trace plots, o ideal é ver uma variação totalmente aleatória ao redor de uma média, e que não tenha nenhum ponto em que os valores fiquem estagnados em um único valor ou saltos entre valores médios diferentes. Da mesma forma, nos gráficos de densidade, o ideal é que tenhamos uma distribuição que se pareça com uma gaussiana, com apenas um valor máximo.
 
 ```{r}
 plot(model_uni$VCV)   #plots traces and posterior distributions of random effect (co)variances
@@ -199,12 +198,12 @@ plot(model_uni$VCV)   #plots traces and posterior distributions of random effect
 
 Se você obtiver médias a posteriori instáveis e/ou distribuições com aspecto estranho, o primeiro passo habitual seria alterar as opções de execução do MCMCglmm em relação aos valores padrão (comprimento total de 13.000 iterações, sendo as primeiras 3.000 descartadas como burn-in, e as 10.000 restantes amostradas a cada 10 iterações — o intervalo de thinning —, resultando em uma amostra a posteriori de tamanho 1.000).
 
-Por exemplo, você poderia utilizar um período de burn-in mais longo e mais iterações, além de amostrar a parte não descartada da cadeia com menos frequência para reduzir a autocorrelação. Naturalmente, isso levará mais tempo para ser executado.
+Por exemplo, você poderia utilizar um período de burn-in mais longo e mais iterações, além de amostrar a parte não descartada da cadeia com menos frequência para reduzir a autocorrelação. Naturalmente, isso vai demorar mais pra rodar.
 
 ```{r, eval=FALSE}
 #7. A longer run. Will you get the same answers?
-model_uni2 <- MCMCglmm(aggression ~ 1+sex+forage, random = ~animal, pedigree = volesPED,
-            data = voles, nitt = 65000, thin = 50, burnin = 15000, prior = prior_uni)
+model_uni2 <- MCMCglmm(aggression ~ 1+sex+forage, random = ~animal, pedigree = squirelsPED,
+            data = squirels, nitt = 65000, thin = 50, burnin = 15000, prior = prior_uni)
 ```
 
 # Ajustando o modelo bivariado no MCMCglmm
@@ -217,11 +216,12 @@ Agora que tivemos um gostinho dos modelos MCMCglmm, vamos estender o modelo e ca
 prior_bi <- list(G = list(G1 = list(V = diag(2), nu = 1.002)),
                           R = list(V = diag(2), nu = 1.002))
 
-
-model_bi <- MCMCglmm(cbind(size, aggression) ~ trait + trait:sex +trait:forage- 1, 
+# Aqui estamos usando a função cbind para definir uma resposta bivariada.
+# A variável "trait", que aparece do lado direito da fórmula, é importante para que os efeitos de sexo, forrageamento, e os interceptos sejam diferentes entre os dois fenótipos analisados.
+model_bi <- MCMCglmm(cbind(size, aggression) ~ trait + trait:sex +trait:forage - 1, 
                     random = ~us(trait):animal,
                     rcov = ~us(trait):units, family = c("gaussian", "gaussian"),
-                    pedigree = volesPED, data = voles, prior = prior_bi, 
+                    pedigree = squirelsPED, data = squirels, prior = prior_bi, 
                     nitt = 65000, thin = 50, burnin = 15000, verbose = TRUE)
 ```
 
@@ -268,3 +268,6 @@ G<-matrix(G_elements, nrow=2)
 ```
 
 
+# Comentários finais
+
+No final, chegamos a uma estimativa de mais ou menos 0,85 para a correlação genética entre agressividade e tamanho. Essa é uma correlação genética bastante alta, compatível com dados usados num tutorial simples para uma disciplina introdutória. Alguns comentários aqui. Primeiro, note como, apesar do nome "Covariância Genética", nós não usamos nenhuma informação genética sobre os indivíduos, apenas as suas relações de parentesco. Nesse sentido, esse é um modelo puramente correlativo: estamos atribuindo a similaridade entre indivíduos aparentados a uma similaridade genética ao chamar essa correlação de "correlação genética". É sempre possível, e precisamos considerar essa possibilidade, que a similaridade entre parentes venha de outras causas, por exemplo, ambientes correlacionados. Isso é fundamental no estudo de populações humanas, por exemplo, em que uma fração grande da similaridade entre parentes vem de ambientes compartilhados. Você herda os genes e a biblioteca dos seus pais. 

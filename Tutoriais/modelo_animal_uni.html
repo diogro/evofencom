@@ -1751,14 +1751,14 @@ seja, o pedigree) foram determinadas por meio da genotipagem de um
 conjunto de marcadores moleculares. O pedigree abrange duas gerações
 (100 pais, 400 descendentes). Medidas de qualidade do forrageamento no
 local de coleta de cada indivíduo também foram feitas.</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a>squirels<span class="ot">&lt;-</span><span class="fu">read.table</span>(<span class="st">&quot;squirels2.txt&quot;</span>, <span class="at">header=</span>T)</span>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a>squirels<span class="ot">&lt;-</span><span class="fu">read.table</span>(<span class="st">&quot;https://raw.githubusercontent.com/diogro/evofencom/refs/heads/main/Tutoriais/squirels2.txt&quot;</span>, <span class="at">header=</span>T)</span>
 <span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a>squirels<span class="sc">$</span>ID<span class="ot">&lt;-</span><span class="fu">as.factor</span>(squirels<span class="sc">$</span>ID)</span>
 <span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a>squirels<span class="sc">$</span>sex<span class="ot">&lt;-</span><span class="fu">as.factor</span>(squirels<span class="sc">$</span>sex)</span>
 <span id="cb1-4"><a href="#cb1-4" tabindex="-1"></a>squirels<span class="sc">$</span>SIRE<span class="ot">&lt;-</span><span class="fu">as.factor</span>(squirels<span class="sc">$</span>SIRE)</span>
 <span id="cb1-5"><a href="#cb1-5" tabindex="-1"></a>squirels<span class="sc">$</span>DAM<span class="ot">&lt;-</span><span class="fu">as.factor</span>(squirels<span class="sc">$</span>DAM)</span>
 <span id="cb1-6"><a href="#cb1-6" tabindex="-1"></a></span>
 <span id="cb1-7"><a href="#cb1-7" tabindex="-1"></a><span class="co">#read in the pedigree file</span></span>
-<span id="cb1-8"><a href="#cb1-8" tabindex="-1"></a>squirelsPED<span class="ot">&lt;-</span><span class="fu">read.table</span>(<span class="st">&quot;squirelsPED.txt&quot;</span>,<span class="at">header=</span>T)</span></code></pre></div>
+<span id="cb1-8"><a href="#cb1-8" tabindex="-1"></a>squirelsPED<span class="ot">&lt;-</span><span class="fu">read.table</span>(<span class="st">&quot;https://raw.githubusercontent.com/diogro/evofencom/refs/heads/main/Tutoriais/squirelsPED.txt&quot;</span>,<span class="at">header=</span>T)</span></code></pre></div>
 <div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a><span class="co">#2. Automatically installs packages in this list that user does not already have</span></span>
 <span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a></span>
 <span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a>list_pkgs <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;lme4&quot;</span>,<span class="st">&quot;lmerTest&quot;</span>,<span class="st">&quot;MCMCglmm&quot;</span>,<span class="st">&quot;pedigreemm&quot;</span>, <span class="st">&quot;sommer&quot;</span>)</span>
