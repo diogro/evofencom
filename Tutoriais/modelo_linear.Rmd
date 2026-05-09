@@ -112,15 +112,15 @@ summary(m1)
 
 Uma vez que o modelo está ajustado, podemos calcular os seus resíduos ($e_i$). Ao invés de tratarmos os resíduos simplesmente como "erros", vamos tratar esses valores como a **variação residual não explicada pela variável preditora**.
 
-Matematicamente, o resíduo para a observação $i$ é a diferença entre o valor real observado ($y_i$) e o valor predito pelo nosso modelo linear ($\hat{y}_i$):
+Matematicamente, o resíduo para a observação $i$ é a diferença entre o valor real observado ($y_i$) e o valor predito pelo nosso modelo linear ($\mu_i$):
 
-$$e_i = y_i - \hat{y}_i$$
+$$e_i = y_i - \mu_i$$
 
 Podemos extrair essa variação não explicada diretamente do nosso modelo ajustado no R usando funções nativas:
 
 ```{r extract_residuals}
 # Extraindo os valores preditos (a porção de y explicada por x)
-y_hat <- fitted(m1)
+mu <- fitted(m1)
 
 # Extraindo os resíduos (a variação residual não explicada)
 res <- residuals(m1)
@@ -135,7 +135,7 @@ plot(y ~ x, pch = 19, main = "Perspectiva 1: Distância da reta de regressão")
 abline(m1, col = "red", lwd = 2)
 
 # Desenhando linhas conectando os pontos reais aos valores preditos
-segments(x0 = x, y0 = y, x1 = x, y1 = y_hat, col = "blue", lty = 2)
+segments(x0 = x, y0 = y, x1 = x, y1 = mu, col = "blue", lty = 2)
 
 ```
 
@@ -231,6 +231,8 @@ Finalmente, vamos olhar para os coeficientes da regressão múltipla, ajustando 
 lm(y ~ x + z) |> coefficients() |> round(2)
 ```
 
+Note como os valores dos coeficientes calculados pela regressão simples e pela regressão múltipla são idênticos. Isso acontece sempre que as variáveis preditoras são não correlacionadas.
+
 ## Preditores correlacionados na regressão múltipla
 
 A situação muda quando os preditores são correlacionados. Vamos simular um exemplo em que X e Z são ambos causados por uma mesma variável não observada U.
@@ -240,7 +242,7 @@ set.seed(2)
 n = 100
 u = rnorm(n)
 
-# X e Z são funções de o?
+# X e Z são funções de u?
 x = 1 + 0.5 * u + rnorm(n)
 z = 3 + 2   * u + rnorm(n)
 
@@ -273,7 +275,7 @@ Podemos reproduzir os coeficientes da regressão múltipla usando apenas regress
 Podemos fazer isso em três passos:
 
 1. Ajustamos um modelo em que $x$ é a variável resposta e $z$ é a preditora.
-2. Extraímos os resíduos dessa regressão. Essa nova variável representará a variação de $x$ que é totalmente independente de $z$.
+2. Extraímos os resíduos dessa regressão. Essa nova variável representará a variação de $x$ que é independente de $z$.
 3. Ajustamos um novo modelo simples de $y$ contra esses resíduos de $x$.
 
 Vamos ver isso em código:
@@ -285,7 +287,7 @@ m_xz <- lm(x ~ z)
 # 2. Extraímos os resíduos (a variação de X que não tem relação com Z)
 res_x <- residuals(m_xz)
 
-# 3. Regredimos Y contra esse X "purificado"
+# 3. Regredimos Y contra esse X residual
 lm(y ~ res_x) |> coefficients() |> round(2)
 
 ```
@@ -298,7 +300,7 @@ Podemos fazer exatamente o mesmo procedimento para isolar o efeito de $z$ sem a 
 # Isolando Z: regredimos Z em função de X e extraímos os resíduos
 res_z <- residuals(lm(z ~ x))
 
-# Regredimos Y contra o Z "purificado"
+# Regredimos Y contra o Z residual
 lm(y ~ res_z) |> coefficients() |> round(2)
 
 ```
@@ -315,7 +317,25 @@ Vamos usar um exemplo com dados reais: o conjunto de dados **ratones**, que cont
 
 ```{r}
 ratones <- read.table("https://raw.githubusercontent.com/diogro/evofencom/refs/heads/main/Tutoriais/ratones.tsv", header = TRUE)
-head(ratones)
+```
+
+Esse é um conjunto de dados relativamente grande.
+
+As primeiras colunas representam variáveis categóricas, como:
+
+- ID de cada indivíduo
+- O sexo de cada indivíduo
+- A qual geração o indivíduo pertence
+- A qual linhagem ele pertence
+- O ID da mãe e do pai do indivíduo
+- A idade do indivíduo em dias
+- Qual linhagem ele pertence
+- Qual o peso dele aos 49 dias
+
+E a partir da coluna IS_PM até a coluna BA_OPI, temos as distâncias cranianas em milímetros.
+
+```{r}
+str(ratones)
 ```
 
 Nosso objetivo é estimar a correlação fenotípica entre um par de variáveis cranianas: o comprimento do osso nasal e o comprimento do palato, dados pelas variáveis NSL_NA e IS_PNS.
