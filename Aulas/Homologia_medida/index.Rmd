@@ -1,0 +1,265 @@
+---
+title: "Homologias, Caracteres e Mensurações"
+author: 
+  - Guilherme Garcia
+  - Diogo Melo
+date: damelo@ib.usp.br
+output:
+  ioslides_presentation:
+    transitions: faster
+    self_contained: yes
+    widescreen: yes
+    fig_caption: yes
+    css: extra.css
+  beamer_presentation: default
+logo: ../../logo.png
+subtitle: 'Modularidade: conectando padrões e processos em evolução multivariada'
+bibliography: "./ModCurso.bib"
+---	
+
+
+
+# Objetivos {.objs}
+
+> - Relacionar o contexto teórico de um fenômeno de interesse às formas de mensurar seus efeitos
+
+> - Elaborar esta relação a respeito de sistemas morfológicos, seu desenvolvimento e função
+
+## Homologias {.columns-2}
+
+* Relações de equivalência entre atributos em espécies distintas
+
+    > + Revelam origens evolutivas em comum
+
+	> + Vias de desenvolvimento compartilhadas
+
+    > + Relação global entre atributos
+
+<p class='forceBreak'> </p>
+
+<div class='centered'>
+<img src='figures/Homology.jpg' height=470px>
+</div>
+
+## Um exemplo mais extremo {.centered}
+
+![](figures/forelimb_phylo.png)
+
+## {.columns-2 .smaller}
+
+> * Desenvolvimento dos elementos ósseos determinado pela expressão dos mesmos *loci* nas três linhagens
+
+&nbsp;
+
+> * Elementos ósseos adicionais nas linhagens derivadas regulados pelos mesmos *loci* em uma fase posterior
+
+<p class='forceBreak'> </p>
+
+<div class='centered'>
+![](figures/hox_homology.png)
+</div>
+
+## Homologias e Mapas Genótipo-Fenótipo {.centered}
+
+![](figures/gpmap_homology_1.png)
+
+## Homologias e Mapas Genótipo-Fenótipo {.centered}
+
+![](figures/gpmap_homology_2.png)
+
+## Como reconhecer homologias? {.centered}
+<img src='figures/mammal_forelimbs.png' height=470px>
+
+## Caráter
+
+Conjunto de atributos *mutuamente exclusivos* identificados em um conjunto de organismos
+
+> - *Mutuamente exclusivos*: a cada organismo atribui-se apenas um estado do caráter
+
+## Exemplo: Coloração {.centered}
+![](figures/lizard_set_0.png)
+
+## Exemplo: Coloração {.centered}
+![](figures/lizard_set_1.png)
+
+## Exemplo: Coloração {.centered}
+![](figures/lizard_set_2.png)
+
+## Exemplo: Coloração {.centered}
+![](figures/lizard_set_3.png)
+
+## Em princípio...
+
+> - Homologias não aparecem nesta definição de caráter
+
+> - Caracteres são divisões arbitrárias que somos capazes de reconhecer em organismos ou suas partes
+
+> - O uso de um conjunto particular de caracteres se justifica com base no contexto teórico de referência
+
+## {.centered .smaller}
+![](figures/dial_1.png)
+
+## {.centered .smaller}
+![](figures/dial_2.png)
+
+## {.centered .smaller}
+![](figures/dial_3.png)
+
+## {.centered .smaller}
+![](figures/dial_4.png)
+
+## Mensuração
+
+> - *Estrutura de relações empíricas*: objetos reais, seus atributos e o conjunto de operações sobre eles
+
+> - *Estrutura de relações numéricas*: valores/estados dos atributos e o conjunto de operações válidas entre estes valores
+
+> - **Mensuração**:  Relação de equivalência entre estas estruturas
+
+## {.centered .smaller}
+![](figures/dial_4.png) 
+
+## {.centered .smaller}
+![](figures/dial_5.png) 
+
+## Temperatura {.centered}
+![](figures/temp_1.png)
+
+## Temperatura {.centered}
+![](figures/temp_2.png)
+
+## Temperatura {.centered}
+![](figures/temp_3.png)
+
+## Temperatura {.centered}
+![](figures/temp_4.png)
+
+## Temperatura {.centered}
+![](figures/temp_5.png)
+
+## Temperatura {.centered}
+![](figures/temp_6.png)
+
+## Temperatura {.centered}
+![](figures/temp_7.png)
+
+## {.centered .smaller}
+![](figures/theory_to_measurement.png)
+
+## Tamanho e Peso {.smaller}
+<div class='centered'>
+![](figures/balance.png)
+</div>
+
+> + Comparação entre objetos permite estrutura de produto nas relações numéricas
+   
+> + Passível de transformação para escala log
+
+## Medidas de referência {.centered}
+<img src='figures/reference_1.png' height = 450px>
+
+## Medidas de referência {.centered}
+<img src='figures/reference_2.png' height = 450px>
+
+## Medidas de referência {.centered}
+<img src='figures/reference_3.png' height = 450px>
+
+## {.centered .smaller}
+![](figures/theory_to_measurement.png)
+
+## Medidas Pragmáticas
+
+- Como mensurar atratividade?
+
+<div class='build'>
+- Poderíamos fazer um experimento:
+
+<div class='centered'>
+![](figures/fishtank_1.png)
+</div>
+</div>
+
+## Medidas Pragmáticas
+
+- Como mensurar atratividade?
+
+- Poderíamos fazer um experimento:
+
+<div class='centered'>
+![](figures/fishtank_2.png)
+</div>
+
+## Medidas Pragmáticas
+
+> - Algumas mensurações apenas aproximam o fenômeno de interesse
+
+> - Aptidão, este atributo elusivo...
+
+> - Nunca se esqueça da distinção entre o fenômeno de interesse e a forma que você usa para representá-lo
+     
+> - Variável teórica -> Variável operacional
+
+## Porque medir caracteres homólogos? {.centered}
+![](figures/gpmap_homology_2.png)
+
+## Quando não medir caracteres homólogos? {.centered}
+![](figures/forelimb_phylo.png)
+
+## Quando não medir caracteres homólogos? {.centered}
+![](figures/forelimb_phylo_func.png)
+
+## Uma Situação Ideal {.centered .smaller}
+![](figures/limb_struct.png)
+
+# Morfometria {.objs}
+
+- *Landmarks*
+
+- Morfometria Tradicional e Geométrica
+
+- Deformações
+
+## *Landmarks*
+
+> * Reduzir as relações de homologia entre partes
+
+> * Relações de homologias entre pontos 
+
+<div class='build'>
+* Tipos de Landmarks
+
+     + Justaposição de tecidos
+	 
+     + Máximos de curvaturas locais
+	 
+     + Máximos de curvaturas globais / outros
+</div>
+
+## {.centered}
+![](figures/landmarks.png)
+
+## Distâncias Lineares {.centered}
+![](figures/skull_dist.png)
+
+## Coordenadas Cartesianas {.centered}
+![](figures/skull_lm.png)
+
+## Análise Generalizada de Procrustes {.centered}
+![](figures/gm.png)
+
+## Deformações {.centered .columns-2}
+
+![](figures/growth.jpg)
+
+<p class='forceBreak'> </p>
+
+![D'arcy Thompson](figures/thompson.jpg)
+
+## Deformações {.columns-2}
+
+<img src='figures/twoshapes.png' width=400px>
+
+<p class='forceBreak'> </p>
+
+<img src='figures/field.png' width=400px>
+
