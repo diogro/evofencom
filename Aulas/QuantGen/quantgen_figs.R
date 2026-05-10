@@ -192,8 +192,7 @@ ggplot(df, aes(x = Phenotype)) +
     axis.title = element_text(face = "bold")
   )
 }
-plot_allele_contribution(0.5, a=2, d=1, sigma = 1, 1000)
-
+plot_allele_contribution(0.5, a=1, d=0, sigma = 1, 1000)
 
 
 library(ggplot2)
