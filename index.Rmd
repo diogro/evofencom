@@ -103,7 +103,7 @@ dt %>%
 
 ### 3. *Homologias, Caracteres e Mensurações* 
 
-+ [Apresentação](Aulas/02/index.html?presentme=false)
++ [Apresentação](Aulas/Homologia_medida/index.html?presentme=false)
 
 + Leituras principais:
 
