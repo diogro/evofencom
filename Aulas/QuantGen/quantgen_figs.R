@@ -128,85 +128,79 @@ library(ggplot2)
 # --- Parameters ---
 p <- 0.25     # Population frequency of the focal allele (0 to 1)
 a <- 1.25     # Additive effect (mean for genotype 1)
-d <- 0.125      # Dominance effect (mean for genotype 1/2)
-sigma <- 0.01 # Phenotypic variation (sd) around the genotypic mean
+d <- 0.5      # Dominance effect (mean for genotype 1/2)
+sigma <- 1 # Phenotypic variation (sd) around the genotypic mean
 N <- 5000     # Increased N for a smoother histogram
 
 plot_allele_contribution <- function(p, a, d, sigma = 0.25, N = 5000){
+  freq_0    <- (1 - p)^2
+  freq_half <- 2 * p * (1 - p)
+  freq_1    <- p^2
   
-# --- Simulation ---
-freq_0    <- (1 - p)^2
-freq_half <- 2 * p * (1 - p)
-freq_1    <- p^2
-
-n_0    <- round(N * freq_0)
-n_half <- round(N * freq_half)
-n_1    <- N - n_0 - n_half 
-
-# Generate simulated data
-genotypes <- c(rep("0", n_0), rep("1/2", n_half), rep("1", n_1))
-mean_values <- c(rep(-a, n_0), rep(d, n_half), rep(a, n_1))
-phenotypes <- rnorm(N, mean = mean_values, sd = sigma)
-
-df <- data.frame(Genotype = factor(genotypes, levels = c("0", "1/2", "1")), 
-                 Phenotype = phenotypes)
-
-# --- Theoretical Density Functions for Overlays ---
-# Scaled by their HW population frequencies
-dist_0    <- function(x) dnorm(x, mean = -a, sd = sigma) * freq_0
-dist_half <- function(x) dnorm(x, mean = d,  sd = sigma) * freq_half
-dist_1    <- function(x) dnorm(x, mean = a,  sd = sigma) * freq_1
-
-# Total population density is the sum of the components
-dist_total <- function(x) dist_0(x) + dist_half(x) + dist_1(x)
-
-up = max(a, d)
-lw = min(-a, d)
-
-# --- Plotting ---
-ggplot(df, aes(x = Phenotype)) +
-  # 1. Histogram of the simulated population data
-  geom_histogram(aes(y = after_stat(density)), bins = 40, 
-                 fill = "grey85", color = "grey60", alpha = 0.7) +
+  n_0    <- round(N * freq_0)
+  n_half <- round(N * freq_half)
+  n_1    <- N - n_0 - n_half 
   
-  # 2. Overlay individual genotype contributions (dashed lines)
-  stat_function(fun = dist_0, color = "#E41A1C", linewidth = 1.2, alpha = 0.5) +
-  stat_function(fun = dist_half, color = "#4DAF4A", linewidth = 1.2, alpha = 0.5) +
-  stat_function(fun = dist_1, color = "#377EB8", linewidth = 1.2, alpha = 0.5) +
+  sub_effect = a + d*((1-p)-p)
   
-  scale_x_continuous(, limits = c(lw - 4*sigma, up + 4*sigma)) + 
+  genotypes <- c(rep("0", n_0), rep("1/2", n_half), rep("1", n_1))
+  mean_values <- c(rep(-a, n_0), rep(d, n_half), rep(a, n_1))
+  phenotypes <- rnorm(N, mean = mean_values, sd = sigma)
   
-  # 3. Overlay total theoretical population distribution (thick solid line)
-  #stat_function(fun = dist_total, color = "black", linewidth = 1.5) +
+  df <- data.frame(Genotype = factor(genotypes, levels = c("0", "1/2", "1")), 
+                   Phenotype = phenotypes)
+  var(df$Phenotype)
+  lmer(Phenotype ~ (1|Genotype), data = df) |> VarCorr()
+  Va = 2*p*(1-p)*sub_effect^2
+  Vd = (2*p*(1-p)*d)^2 
+  Ve = var(df$Phenotype) - Va - Vd
+
+   
   
-  # 4. Labels and theming
-  labs(
-    title = "Locus Contribution to Phenotypic Variance",
-    subtitle = bquote("Parameters:" ~ p == .(p) * "," ~ a == .(a) * "," ~ d == .(d) * "," ~ sigma == .(sigma)),
-    x = "Phenotypic Value",
-    y = "Probability Density"
-  ) +
-  theme_minimal() +
-  theme(
-    plot.title = element_text(face = "bold", size = 14),
-    axis.title = element_text(face = "bold")
-  )
+  dist_0    <- function(x) dnorm(x, mean = -a, sd = sigma) * freq_0
+  dist_half <- function(x) dnorm(x, mean = d,  sd = sigma) * freq_half
+  dist_1    <- function(x) dnorm(x, mean = a,  sd = sigma) * freq_1
+  
+  up = max(a, d)
+  lw = min(-a, d)
+  
+  ggplot(df, aes(x = Phenotype)) +
+    geom_histogram(aes(y = after_stat(density)), bins = 40, 
+                   fill = "grey85", color = "grey60", alpha = 0.7) +
+    stat_function(fun = dist_0, aes(color = "0"), linewidth = 1.2, alpha = 0.7) +
+    stat_function(fun = dist_half, aes(color = "1/2"), linewidth = 1.2, alpha = 0.7) +
+    stat_function(fun = dist_1, aes(color = "1"), linewidth = 1.2, alpha = 0.7) +
+    scale_x_continuous(limits = c(lw - 4*sigma, up + 4*sigma)) + 
+    scale_color_manual(values = c("0" = "#E41A1C", "1/2" = "#4DAF4A", "1" = "#377EB8"), name = "Genotype") +
+    labs(
+      title = "Locus Contribution to Phenotypic Variance",
+      subtitle = bquote("Parameters:" ~ p == .(p) * "," ~ a == .(a) * "," ~ d == .(d) * "," ~ sigma == .(sigma) * "|" ~ alpha == .(sub_effect)
+                        * "," ~ Va == .(Va |> round(3)) * "," ~ Vd == .(Vd |> round(3)) * "," ~ Ve == .(Ve |> round(3))),
+      x = "Phenotypic Value",
+      y = "Probability Density"
+    ) +
+    theme_minimal() +
+    theme(plot.title = element_text(face = "bold", size = 14), axis.title = element_text(face = "bold"))
 }
-plot_allele_contribution(0.5, a=1, d=0, sigma = 1, 1000)
 
+p = plot_allele_contribution(0.5, a=1, d=0, sigma = 1, 5000)
+save_plot("Aulas/QuantGen/1locus-continuous.png", p)
+
+p = plot_allele_contribution(0.5, a=1, d=0, sigma = 0.1, 5000)
+save_plot("Aulas/QuantGen/1locus-mendelian.png", p)
 
 library(ggplot2)
 
 # --- Parameters ---
-p_A <- 0.5   # Allele frequency at locus A
-a_A <- 1.0   # Additive effect of locus A
-d_A <- 0.   # Dominance effect of locus A (shift of the heterozygote)
+p_A <- 0.6   # Allele frequency at locus A
+a_A <- 1   # Additive effect of locus A
+d_A <- 0.5   # Dominance effect of locus A (shift of the heterozygote)
 
-p_B <- 0.5   # Allele frequency at locus B
+p_B <- 0.25   # Allele frequency at locus B
 a_B <- 1.0   # Additive effect of locus B
-d_B <- 0.  # Dominance effect of locus B
+d_B <- 0.8  # Dominance effect of locus B
 
-sigma <- .5 # Phenotypic variation (sd) around the genotypic mean
+sigma <- 1 # Phenotypic variation (sd) around the genotypic mean
 N <- 10000   # Population size
 
 # --- Simulation: Calculate the 9 genotypic classes ---
@@ -270,4 +264,4 @@ p_plot <- p_plot +
   )
 
 print(p_plot)
-
+save_plot("Aulas/QuantGen/2locus-dom-continuous.png", p_plot)
