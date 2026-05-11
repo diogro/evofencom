@@ -85,7 +85,7 @@ dt %>%
 
 ### 2. *Arquitetura Genética de fenótipos complexos: O mapa genótipo-fenótipo*
 
-+ [Apresentação](Aulas/IntroQuantGen/index.html?presentme=false)
++ [Apresentação](Aulas/ArquiteturaGeneticaFenCom.pdf)
 
 + Leitura principal: 
 
