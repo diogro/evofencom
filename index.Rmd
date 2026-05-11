@@ -247,4 +247,12 @@ Nature Ecology & Evolution, 7(8), 1181-1193.
 
 **Tutorial 7**: [*Métodos Comparativos II*](Tutoriais/consequencias_evolutivas.html)
 
+# Shiny Apps
 
+Link para os simuladores que usamos em sala:
+
+- [Efeitos genéticos e variância de um locus](https://damelo.shinyapps.io/alleleeffects/)
+
+- [Visualizando a Equação de Lande](https://damelo.shinyapps.io/eq-de-lande/)
+
+- [Superfícies Adaptativas](https://damelo.shinyapps.io/superficie-adaptativa/)
