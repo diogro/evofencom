@@ -5,11 +5,10 @@ library(wesanderson)
 library(mvtnorm)
 library(matrixStats)
 library(MASS)
-library(bslib) # Added for modern UI styling
+library(bslib) 
 library(shinycssloaders)
 library(ContourFunctions)
 
-# --- PLACE YOUR HELPER FUNCTIONS HERE ---
 Norm = function(x) sqrt(sum(x^2))
 
 Normalize = function(x) x / Norm(x)
@@ -252,7 +251,6 @@ diff_cut_off <- 1e-4
 max_gens <- 10000
 max_stand_still <- 100
 
-# --- UI ---
 ui <- page_sidebar(
   title = "Evolutionary Trajectories on Adaptive Surfaces",
   theme = bs_theme(version = 5, bootswatch = "flatly"), # Modern, clean theme
@@ -272,7 +270,6 @@ ui <- page_sidebar(
   )
 )
 
-# --- SERVER ---
 server <- function(input, output, session) {
   
   # 1. REACTIVE: Generate the landscape (Peaks and Theta). 
