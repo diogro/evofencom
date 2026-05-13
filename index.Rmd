@@ -75,7 +75,7 @@ dt %>%
 
 ### 1. Origem, manutenção e organização de variação fenotípica e genética
 
-+ [Apresentação](Aulas/Historico.pdf)
++ [Apresentação](Aulas/Aula_1_variation_Maio26.pdf)
 
 + Leitura principal:
    
@@ -103,7 +103,7 @@ dt %>%
 
 ### 3. *Homologias, Caracteres e Mensurações* 
 
-+ [Apresentação](Aulas/Homologia_medida/index.html?presentme=false)
++ [Apresentação](Aulas/Aula 3-HomologiaMensuracao.pdf)
 
 + Leituras principais:
 
@@ -120,7 +120,7 @@ dt %>%
 
 ### 4. *Caracterização de variação em dimensionalidade alta*
 
-+ [Apresentação](Aulas/Quantificando variação multivariada.pdf)
++ [Apresentação](Aulas/Quantificando variação multivariada.pdf)
 
 + Leituras principais:
 
@@ -133,7 +133,7 @@ dt %>%
 
 ### 5. *Fenótipos moleculares, mapeamento genético, redes de co-expressão gênica*
 
-+ [Apresentação](Aulas/fenotipos_moleculares.pdf)
++ [Apresentação](Aulas/FenótiposMolecularesMapeamento.pdf)
 
 + Leitura principal: 
 
@@ -148,7 +148,7 @@ dt %>%
 
 ### 6. *Paisagem adaptativa fenotípica e seleção natural*
 
-+ [Apresentação](Aulas/deteccao_modularidade.pdf)
++ [Apresentação](Aulas/SelecaoVariacao.pdf)
 
 + Leituras Principais
 
