@@ -1,0 +1,71 @@
+---
+title: "Estimando seleção na natureza"
+author: 
+  - Diogo Melo
+  - Alastair Wilson
+date: "2026-05-20"
+output:
+  html_document:
+    code_folding: show
+    highlight: pygments
+    number_sections: false
+    toc: true
+    toc_depth: 2
+    theme: yeti
+    toc_float: 
+      collapsed: false
+      smooth_scroll: false
+  pdf_document:
+    latex_engine: xelatex
+header-includes:
+  - \usepackage[brazilian]{babel}
+  - \usepackage[utf8]{inputenc}
+  - \usepackage[bitstream-charter]{mathdesign}
+  - \usepackage{setspace}
+  - \doublespacing
+fontsize: 14pt
+---
+
+\newcommand{\ihat}{\boldsymbol{\hat \imath}}
+\newcommand{\jhat}{\boldsymbol{\hat \jmath}}
+\newcommand{\uvec}{\boldsymbol{\vec{u}}}
+\newcommand{\vvec}{\boldsymbol{\vec{v}}}
+\newcommand{\wvec}{\boldsymbol{\vec{w}}}
+
+<style>
+@import url('https://fonts.googleapis.com/css?family=Crimson+Text|Overpass+Mono:400|Lora:700');
+
+code.r{
+	font-family: "Overpass Mono";
+	font-size: 10pt;
+}
+
+body{
+	font-family: 'Crimson Text';
+	font-size: 16pt;
+}
+
+h1,h2,h3,h4{
+	font-family: 'Lora';
+}
+
+h5,h6{
+ 	font-family: 'Crimson Text';
+}
+</style>
+
+<script type="text/x-mathjax-config">
+   MathJax.Hub.Config({  "HTML-CSS": { minScaleAdjust: 100, availableFonts: [] }  });
+</script>
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Seleção em um fenótipo bivariado (agressividade e tamanho) em esquilos
+
+# Diferenciais de seleção
+
+# Gradientes de seleção lineares
+
+# Gradientes de seleção não-lineares

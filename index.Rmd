@@ -239,7 +239,7 @@ Nature Ecology & Evolution, 7(8), 1181-1193.
 
 **Tutorial 3.3**: [*Modelos animal bivariado*](Tutoriais/modelo_animal_multi.html)
 
-**Tutorial 4**: [*Estimando Seleção*](Tutoriais/detectando_modularidade.html)
+**Tutorial 4**: [*Estimando Seleção*](Tutoriais/estimando_selecao.html)
 
 **Tutorial 5**: [*Modelos de Desempenho Funcional*](Tutoriais/selecao.html)
 
