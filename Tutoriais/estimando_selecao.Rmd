@@ -64,7 +64,35 @@ knitr::opts_chunk$set(echo = TRUE)
 
 # Seleção em um fenótipo bivariado (agressividade e tamanho) em esquilos
 
+```{r}
+#1. read in the new data file and set soe variables as factors
+squirels<-read.table("https://raw.githubusercontent.com/diogro/evofencom/refs/heads/main/Tutoriais/squirelsNEW.txt", header=T)
+squirels$ID<-as.factor(squirels$ID)
+squirels$sex<-as.factor(squirels$sex)
+squirels$SIRE<-as.factor(squirels$SIRE)
+squirels$DAM<-as.factor(squirels$DAM)
+
+#check structure
+str(squirels)
+```
+
+```{r, eval = FALSE}
+summary(squirels$fitness)
+hist(squirels$fitness)
+```
+
+
+
 # Diferenciais de seleção
+
+```{r, eval = FALSE}
+S_size<-cov(squirels$w, squirels$size)
+S_size
+
+S_agg<-cov(squirels$w, squirels$aggression)
+S_agg
+```
+
 
 # Gradientes de seleção lineares
 
