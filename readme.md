@@ -62,7 +62,7 @@ O link "Atividades Preparatórias" oferece um introdução da linguagem.
 
 ### 3. *Homologias, Caracteres e Mensurações* 
 
-+ [Apresentação](Aulas/Aula 3_Mensuração.pdf).
++ [Apresentação](Aulas/Aula3_Mensuração.pdf).
 
 + Leituras principais:
 
