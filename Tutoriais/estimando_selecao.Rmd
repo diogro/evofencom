@@ -66,7 +66,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ```{r}
 #1. read in the new data file and set soe variables as factors
-squirels<-read.table("https://raw.githubusercontent.com/diogro/evofencom/refs/heads/main/Tutoriais/squirelsNEW.txt", header=T)
+squirels<-read.table("https://raw.githubusercontent.com/diogro/evofencom/refs/heads/main/Tutoriais/squirels.txt", header=T)
 squirels$ID<-as.factor(squirels$ID)
 squirels$sex<-as.factor(squirels$sex)
 squirels$SIRE<-as.factor(squirels$SIRE)

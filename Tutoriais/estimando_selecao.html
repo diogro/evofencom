@@ -1742,14 +1742,14 @@ font-family: 'Crimson Text';
 <h1>Seleção em um fenótipo bivariado (agressividade e tamanho) em
 esquilos</h1>
 <div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="co">#1. read in the new data file and set soe variables as factors</span></span>
-<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a>squirelsNEW<span class="ot">&lt;-</span><span class="fu">read.table</span>(<span class="st">&quot;https://raw.githubusercontent.com/diogro/evofencom/refs/heads/main/Tutoriais/squirelsNEW.txt&quot;</span>, <span class="at">header=</span>T)</span>
-<span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a>squirelsNEW<span class="sc">$</span>ID<span class="ot">&lt;-</span><span class="fu">as.factor</span>(squirelsNEW<span class="sc">$</span>ID)</span>
-<span id="cb1-4"><a href="#cb1-4" tabindex="-1"></a>squirelsNEW<span class="sc">$</span>sex<span class="ot">&lt;-</span><span class="fu">as.factor</span>(squirelsNEW<span class="sc">$</span>sex)</span>
-<span id="cb1-5"><a href="#cb1-5" tabindex="-1"></a>squirelsNEW<span class="sc">$</span>SIRE<span class="ot">&lt;-</span><span class="fu">as.factor</span>(squirelsNEW<span class="sc">$</span>SIRE)</span>
-<span id="cb1-6"><a href="#cb1-6" tabindex="-1"></a>squirelsNEW<span class="sc">$</span>DAM<span class="ot">&lt;-</span><span class="fu">as.factor</span>(squirelsNEW<span class="sc">$</span>DAM)</span>
+<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a>squirels<span class="ot">&lt;-</span><span class="fu">read.table</span>(<span class="st">&quot;https://raw.githubusercontent.com/diogro/evofencom/refs/heads/main/Tutoriais/squirels.txt&quot;</span>, <span class="at">header=</span>T)</span>
+<span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a>squirels<span class="sc">$</span>ID<span class="ot">&lt;-</span><span class="fu">as.factor</span>(squirels<span class="sc">$</span>ID)</span>
+<span id="cb1-4"><a href="#cb1-4" tabindex="-1"></a>squirels<span class="sc">$</span>sex<span class="ot">&lt;-</span><span class="fu">as.factor</span>(squirels<span class="sc">$</span>sex)</span>
+<span id="cb1-5"><a href="#cb1-5" tabindex="-1"></a>squirels<span class="sc">$</span>SIRE<span class="ot">&lt;-</span><span class="fu">as.factor</span>(squirels<span class="sc">$</span>SIRE)</span>
+<span id="cb1-6"><a href="#cb1-6" tabindex="-1"></a>squirels<span class="sc">$</span>DAM<span class="ot">&lt;-</span><span class="fu">as.factor</span>(squirels<span class="sc">$</span>DAM)</span>
 <span id="cb1-7"><a href="#cb1-7" tabindex="-1"></a></span>
 <span id="cb1-8"><a href="#cb1-8" tabindex="-1"></a><span class="co">#check structure</span></span>
-<span id="cb1-9"><a href="#cb1-9" tabindex="-1"></a><span class="fu">str</span>(squirelsNEW)</span></code></pre></div>
+<span id="cb1-9"><a href="#cb1-9" tabindex="-1"></a><span class="fu">str</span>(squirels)</span></code></pre></div>
 <pre><code>## &#39;data.frame&#39;:    500 obs. of  8 variables:
 ##  $ ID        : Factor w/ 500 levels &quot;1&quot;,&quot;2&quot;,&quot;3&quot;,&quot;4&quot;,..: 401 402 403 404 405 406 407 408 409 410 ...
 ##  $ aggression: num  3.68 9.9 9.55 5.14 3.82 ...
@@ -1759,15 +1759,15 @@ esquilos</h1>
 ##  $ DAM       : Factor w/ 80 levels &quot;401&quot;,&quot;402&quot;,&quot;403&quot;,..: NA NA NA NA NA NA NA NA NA NA ...
 ##  $ forage    : num  -0.1494 -1.1443 0.4533 0.1283 0.0317 ...
 ##  $ fitness   : num  1.26 2.21 2.44 2.8 2.1 ...</code></pre>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a><span class="fu">summary</span>(squirelsNEW<span class="sc">$</span>fitness)</span>
-<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a><span class="fu">hist</span>(squirelsNEW<span class="sc">$</span>fitness)</span></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a><span class="fu">summary</span>(squirels<span class="sc">$</span>fitness)</span>
+<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a><span class="fu">hist</span>(squirels<span class="sc">$</span>fitness)</span></code></pre></div>
 </div>
 <div id="diferenciais-de-seleção" class="section level1">
 <h1>Diferenciais de seleção</h1>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a>S_size<span class="ot">&lt;-</span><span class="fu">cov</span>(squirelsNEW<span class="sc">$</span>w, squirelsNEW<span class="sc">$</span>size)</span>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a>S_size<span class="ot">&lt;-</span><span class="fu">cov</span>(squirels<span class="sc">$</span>w, squirels<span class="sc">$</span>size)</span>
 <span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a>S_size</span>
 <span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a></span>
-<span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a>S_agg<span class="ot">&lt;-</span><span class="fu">cov</span>(squirelsNEW<span class="sc">$</span>w, squirelsNEW<span class="sc">$</span>aggression)</span>
+<span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a>S_agg<span class="ot">&lt;-</span><span class="fu">cov</span>(squirels<span class="sc">$</span>w, squirels<span class="sc">$</span>aggression)</span>
 <span id="cb4-5"><a href="#cb4-5" tabindex="-1"></a>S_agg</span></code></pre></div>
 </div>
 <div id="gradientes-de-seleção-lineares" class="section level1">
