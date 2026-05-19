@@ -1741,6 +1741,14 @@ font-family: 'Crimson Text';
 <div id="seleção-em-um-fenótipo-bivariado-agressividade-e-tamanho-em-esquilos" class="section level1">
 <h1>Seleção em um fenótipo bivariado (agressividade e tamanho) em
 esquilos</h1>
+<p>Precisamos de dados sobre a aptidão individual, bem como sobre o
+fenótipo. Isso está disponível como uma coluna adicional no arquivo de
+dados atualizado. Definir e medir a aptidão ao longo da vida de um
+indivíduo é difícil. Talvez o melhor proxy simples de aptidão seja o
+número total de descendentes produzidos ao longo da vida, mas se a
+população estiver em crescimento uma amostra de indivíduos pode não ser
+representativa. De qualquer forma, vamos assumir que temos aqui alguma
+medida válida de aptidão individual.</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="co">#1. read in the new data file and set soe variables as factors</span></span>
 <span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a>squirels<span class="ot">&lt;-</span><span class="fu">read.table</span>(<span class="st">&quot;https://raw.githubusercontent.com/diogro/evofencom/refs/heads/main/Tutoriais/squirels.txt&quot;</span>, <span class="at">header=</span>T)</span>
 <span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a>squirels<span class="sc">$</span>ID<span class="ot">&lt;-</span><span class="fu">as.factor</span>(squirels<span class="sc">$</span>ID)</span>
@@ -1759,22 +1767,101 @@ esquilos</h1>
 ##  $ DAM       : Factor w/ 80 levels &quot;401&quot;,&quot;402&quot;,&quot;403&quot;,..: NA NA NA NA NA NA NA NA NA NA ...
 ##  $ forage    : num  -0.1494 -1.1443 0.4533 0.1283 0.0317 ...
 ##  $ fitness   : num  1.26 2.21 2.44 2.8 2.1 ...</code></pre>
+<p>Agora temos uma medida de aptidão que podemos usar para a análise de
+seleção; vamos sumarizar e visualizar sua distribuição.</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a><span class="fu">summary</span>(squirels<span class="sc">$</span>fitness)</span>
 <span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a><span class="fu">hist</span>(squirels<span class="sc">$</span>fitness)</span></code></pre></div>
+<p>Ótimo — é basicamente Gaussiana, quase como se alguém a tivesse
+simulado os dados :). Seleção quase sempre pode ser medida usando
+aptidão relativa, então vamos criar uma coluna de aptidão relativa que
+chamaremos de “w”, a notação padrão.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a>squirels<span class="sc">$</span>w<span class="ot">&lt;-</span>squirels<span class="sc">$</span>fitness<span class="sc">/</span><span class="fu">mean</span>(squirels<span class="sc">$</span>fitness)</span></code></pre></div>
 </div>
 <div id="diferenciais-de-seleção" class="section level1">
 <h1>Diferenciais de seleção</h1>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a>S_size<span class="ot">&lt;-</span><span class="fu">cov</span>(squirels<span class="sc">$</span>w, squirels<span class="sc">$</span>size)</span>
-<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a>S_size</span>
-<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a></span>
-<span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a>S_agg<span class="ot">&lt;-</span><span class="fu">cov</span>(squirels<span class="sc">$</span>w, squirels<span class="sc">$</span>aggression)</span>
-<span id="cb4-5"><a href="#cb4-5" tabindex="-1"></a>S_agg</span></code></pre></div>
+<p>O S na equação univariada do criador é o diferencial de seleção.
+Podemos obtê-lo simplesmente como a covariância entre o traço e a
+aptidão.</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a>S_size<span class="ot">&lt;-</span><span class="fu">cov</span>(squirels<span class="sc">$</span>w, squirels<span class="sc">$</span>size)</span>
+<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a>S_size</span>
+<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a></span>
+<span id="cb5-4"><a href="#cb5-4" tabindex="-1"></a>S_agg<span class="ot">&lt;-</span><span class="fu">cov</span>(squirels<span class="sc">$</span>w, squirels<span class="sc">$</span>aggression)</span>
+<span id="cb5-5"><a href="#cb5-5" tabindex="-1"></a>S_agg</span></code></pre></div>
+<p>Se quiser, podemos aferir a significância dessas relações usando um
+teste de significância de correlação, mas isso não é necessário para a
+análise de seleção.</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a><span class="fu">cor.test</span>(squirels<span class="sc">$</span>w, squirels<span class="sc">$</span>size)          </span>
+<span id="cb6-2"><a href="#cb6-2" tabindex="-1"></a><span class="fu">cor.test</span>(squirels<span class="sc">$</span>w, squirels<span class="sc">$</span>aggression)    </span></code></pre></div>
+<p>Como você interpreta esses resultados?</p>
 </div>
 <div id="gradientes-de-seleção-lineares" class="section level1">
 <h1>Gradientes de seleção lineares</h1>
+<p>Já sabemos que esses dois traços covariam — se você ainda não fez o
+tutorial do modelo animal bivariado, confirme agora que isso é
+verdadeiro ajustando um modelo de regressão simples.</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a>mod_regress <span class="ot">&lt;-</span> <span class="fu">lm</span>(aggression<span class="sc">~</span>size, <span class="at">data=</span>squirels)          </span>
+<span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a><span class="fu">summary</span>(mod_regress)</span>
+<span id="cb7-3"><a href="#cb7-3" tabindex="-1"></a><span class="fu">plot</span>(squirels<span class="sc">$</span>size,squirels<span class="sc">$</span>aggression, <span class="at">pch =</span> <span class="dv">19</span>)               </span>
+<span id="cb7-4"><a href="#cb7-4" tabindex="-1"></a><span class="fu">abline</span>(mod_regress, <span class="at">col =</span> <span class="dv">2</span>)</span></code></pre></div>
+<p>Para analisar a seleção linear em ambos os traços simultaneamente,
+podemos usar um modelo linear (regressão múltipla) para estimar e testar
+os gradientes de seleção. Esses são os coeficientes de regressão parcial
+dos traços sobre a aptidão relativa.</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a>linear_sel<span class="ot">&lt;-</span><span class="fu">lm</span>(w<span class="sc">~</span>size<span class="sc">+</span> aggression, <span class="at">data=</span>squirels)</span>
+<span id="cb8-2"><a href="#cb8-2" tabindex="-1"></a><span class="fu">summary</span>(linear_sel)</span></code></pre></div>
+<p>O que você conclui agora? Se quisermos reportar esses gradientes de
+seleção de uma forma comparável entre estudos, podemos transformá-los em
+<strong>gradientes de seleção padronizados</strong>. Esses são os
+coeficientes de regressão parcial obtidos quando colocamos os traços em
+unidades de desvio padrão:</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" tabindex="-1"></a>squirels<span class="sc">$</span>sizeSD<span class="ot">&lt;-</span>squirels<span class="sc">$</span>size<span class="sc">/</span><span class="fu">sd</span>(squirels<span class="sc">$</span>size)</span>
+<span id="cb9-2"><a href="#cb9-2" tabindex="-1"></a>squirels<span class="sc">$</span>aggressionSD<span class="ot">&lt;-</span>squirels<span class="sc">$</span>aggression<span class="sc">/</span><span class="fu">sd</span>(squirels<span class="sc">$</span>aggression)   <span class="co">#define variables in SDUs</span></span>
+<span id="cb9-3"><a href="#cb9-3" tabindex="-1"></a></span>
+<span id="cb9-4"><a href="#cb9-4" tabindex="-1"></a>linear_sel_SD<span class="ot">&lt;-</span><span class="fu">lm</span>(w <span class="sc">~</span> sizeSD<span class="sc">+</span> aggressionSD, <span class="at">data=</span>squirels)     <span class="co">#then refit the model</span></span>
+<span id="cb9-5"><a href="#cb9-5" tabindex="-1"></a><span class="fu">summary</span>(linear_sel_SD)</span></code></pre></div>
+<p>Note que este é o mesmo modelo; apenas escalamos as variáveis de
+forma diferente, então os tamanhos de efeito vão mudar, mas as
+conclusões não! A partir desta regressão múltipla simples, obtemos o
+vetor beta dos gradientes lineares de seleção. Poderíamos combinar uma
+estimativa da matriz G para prever a mudança na média bivariada, tanto
+em unidades observadas dos traços quanto em unidades de desvio
+padrão.</p>
 </div>
 <div id="gradientes-de-seleção-não-lineares" class="section level1">
 <h1>Gradientes de seleção não-lineares</h1>
+<p>Podemos expandir o modelo para estimar os parametros de seleção não
+linear adicionando a) efeitos quadráticos de cada traço sobre a aptidão
+e b) uma interação entre os dois traços. Abaixo usamos novamente a
+escala observada dos traços, mas você pode usar unidades de desvio
+padrão, se preferir.</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" tabindex="-1"></a>nonlinear_sel<span class="ot">&lt;-</span><span class="fu">lm</span>(w<span class="sc">~</span>size<span class="sc">+</span>aggression<span class="sc">+</span><span class="fu">I</span>(size<span class="sc">*</span>size)<span class="sc">+</span><span class="fu">I</span>(aggression<span class="sc">*</span>aggression)<span class="sc">+</span><span class="fu">I</span>(size<span class="sc">*</span>aggression), <span class="at">data=</span>squirels)</span>
+<span id="cb10-2"><a href="#cb10-2" tabindex="-1"></a><span class="fu">summary</span>(nonlinear_sel)</span></code></pre></div>
+<p>Há muitos termos significativos aqui, então o que isso significa?
+Você consegue interpretá-los?</p>
+<p>Pode ser útil plotar a superfície de aptidão descrita por este
+modelo. Como a aptidão (predita) muda com diferentes combinações dos
+dois traços?</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb11-2"><a href="#cb11-2" tabindex="-1"></a></span>
+<span id="cb11-3"><a href="#cb11-3" tabindex="-1"></a>grid <span class="ot">&lt;-</span> <span class="fu">expand.grid</span>(</span>
+<span id="cb11-4"><a href="#cb11-4" tabindex="-1"></a>  <span class="at">size =</span> <span class="fu">seq</span>(<span class="fu">min</span>(squirels<span class="sc">$</span>size), <span class="fu">max</span>(squirels<span class="sc">$</span>size), <span class="at">length.out =</span> <span class="dv">100</span>),</span>
+<span id="cb11-5"><a href="#cb11-5" tabindex="-1"></a>  <span class="at">aggression =</span> <span class="fu">seq</span>(<span class="fu">min</span>(squirels<span class="sc">$</span>aggression), <span class="fu">max</span>(squirels<span class="sc">$</span>aggression), <span class="at">length.out =</span> <span class="dv">100</span>)</span>
+<span id="cb11-6"><a href="#cb11-6" tabindex="-1"></a>)</span>
+<span id="cb11-7"><a href="#cb11-7" tabindex="-1"></a>grid<span class="sc">$</span>w_pred <span class="ot">&lt;-</span> <span class="fu">predict</span>(nonlinear_sel, <span class="at">newdata =</span> grid)</span>
+<span id="cb11-8"><a href="#cb11-8" tabindex="-1"></a>grid<span class="sc">$</span>w_pred <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(grid<span class="sc">$</span>w_pred)</span>
+<span id="cb11-9"><a href="#cb11-9" tabindex="-1"></a><span class="fu">ggplot</span>(grid, <span class="fu">aes</span>(<span class="at">x =</span> size, <span class="at">y =</span> aggression, <span class="at">z =</span> w_pred)) <span class="sc">+</span></span>
+<span id="cb11-10"><a href="#cb11-10" tabindex="-1"></a>  <span class="fu">geom_contour_filled</span>(<span class="at">bins =</span> <span class="dv">30</span>) <span class="sc">+</span></span>
+<span id="cb11-11"><a href="#cb11-11" tabindex="-1"></a>  <span class="fu">geom_point</span>(</span>
+<span id="cb11-12"><a href="#cb11-12" tabindex="-1"></a>    <span class="at">data =</span> squirels,</span>
+<span id="cb11-13"><a href="#cb11-13" tabindex="-1"></a>    <span class="fu">aes</span>(<span class="at">x =</span> size, <span class="at">y =</span> aggression),</span>
+<span id="cb11-14"><a href="#cb11-14" tabindex="-1"></a>    <span class="at">inherit.aes =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb11-15"><a href="#cb11-15" tabindex="-1"></a>    <span class="at">shape =</span> <span class="dv">16</span>,</span>
+<span id="cb11-16"><a href="#cb11-16" tabindex="-1"></a>    <span class="at">size =</span> <span class="dv">1</span>,</span>
+<span id="cb11-17"><a href="#cb11-17" tabindex="-1"></a>    <span class="at">alpha =</span> <span class="fl">0.6</span></span>
+<span id="cb11-18"><a href="#cb11-18" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb11-19"><a href="#cb11-19" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">&quot;size&quot;</span>, <span class="at">y =</span> <span class="st">&quot;aggression&quot;</span>, <span class="at">fill =</span> <span class="st">&quot;w (predita)&quot;</span>) <span class="sc">+</span></span>
+<span id="cb11-20"><a href="#cb11-20" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span> <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">&quot;none&quot;</span>) </span>
+<span id="cb11-21"><a href="#cb11-21" tabindex="-1"></a><span class="co">#zlim=c(0,5) #use this to get rid of areas where w&lt;0 predicted</span></span></code></pre></div>
 </div>
 
 

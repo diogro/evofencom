@@ -64,6 +64,8 @@ knitr::opts_chunk$set(echo = TRUE)
 
 # Seleção em um fenótipo bivariado (agressividade e tamanho) em esquilos
 
+Precisamos de dados sobre a aptidão individual, bem como sobre o fenótipo. Isso está disponível como uma coluna adicional no arquivo de dados atualizado. Definir e medir a aptidão ao longo da vida de um indivíduo é difícil. Talvez o melhor proxy simples de aptidão seja o número total de descendentes produzidos ao longo da vida, mas se a população estiver em crescimento uma amostra de indivíduos pode não ser representativa. De qualquer forma, vamos assumir que temos aqui alguma medida válida de aptidão individual.
+
 ```{r}
 #1. read in the new data file and set soe variables as factors
 squirels<-read.table("https://raw.githubusercontent.com/diogro/evofencom/refs/heads/main/Tutoriais/squirels.txt", header=T)
@@ -76,14 +78,21 @@ squirels$DAM<-as.factor(squirels$DAM)
 str(squirels)
 ```
 
+Agora temos uma medida de aptidão que podemos usar para a análise de seleção; vamos sumarizar e visualizar sua distribuição.
+
 ```{r, eval = FALSE}
 summary(squirels$fitness)
 hist(squirels$fitness)
 ```
+Ótimo — é basicamente Gaussiana, quase como se alguém a tivesse simulado os dados :). Seleção quase sempre pode ser medida usando aptidão relativa, então vamos criar uma coluna de aptidão relativa que chamaremos de “w”, a notação padrão.
 
-
+```{r, eval = FALSE}
+squirels$w<-squirels$fitness/mean(squirels$fitness)
+```
 
 # Diferenciais de seleção
+
+O S na equação univariada do criador é o diferencial de seleção. Podemos obtê-lo simplesmente como a covariância entre o traço e a aptidão.
 
 ```{r, eval = FALSE}
 S_size<-cov(squirels$w, squirels$size)
@@ -92,8 +101,79 @@ S_size
 S_agg<-cov(squirels$w, squirels$aggression)
 S_agg
 ```
+Se quiser, podemos aferir a significância dessas relações usando um teste de significância de correlação, mas isso não é necessário para a análise de seleção.
 
+```{r, eval = FALSE}
+cor.test(squirels$w, squirels$size)          
+cor.test(squirels$w, squirels$aggression)    
+```
+
+Como você interpreta esses resultados?
 
 # Gradientes de seleção lineares
 
+Já sabemos que esses dois traços covariam — se você ainda não fez o tutorial do modelo animal bivariado, confirme agora que isso é verdadeiro ajustando um modelo de regressão simples.
+
+```{r, eval = FALSE}
+mod_regress <- lm(aggression~size, data=squirels)          
+summary(mod_regress)
+plot(squirels$size,squirels$aggression, pch = 19)               
+abline(mod_regress, col = 2)
+```
+
+Para analisar a seleção linear em ambos os traços simultaneamente, podemos usar um modelo linear (regressão múltipla) para estimar e testar os gradientes de seleção. Esses são os coeficientes de regressão parcial dos traços sobre a aptidão relativa.
+
+```{r, eval = FALSE}
+linear_sel<-lm(w~size+ aggression, data=squirels)
+summary(linear_sel)
+```
+
+O que você conclui agora? Se quisermos reportar esses gradientes de seleção de uma forma comparável entre estudos, podemos transformá-los em **gradientes de seleção padronizados**. Esses são os coeficientes de regressão parcial obtidos quando colocamos os traços em unidades de desvio padrão:
+
+```{r, eval = FALSE}
+squirels$sizeSD<-squirels$size/sd(squirels$size)
+squirels$aggressionSD<-squirels$aggression/sd(squirels$aggression)   #define variables in SDUs
+
+linear_sel_SD<-lm(w ~ sizeSD+ aggressionSD, data=squirels)     #then refit the model
+summary(linear_sel_SD)
+```
+
+Note que este é o mesmo modelo; apenas escalamos as variáveis de forma diferente, então os tamanhos de efeito vão mudar, mas as conclusões não! A partir desta regressão múltipla simples, obtemos o vetor beta dos gradientes lineares de seleção. Poderíamos combinar uma estimativa da matriz G para prever a mudança na média bivariada, tanto em unidades observadas dos traços quanto em unidades de desvio padrão.
+
 # Gradientes de seleção não-lineares
+
+Podemos expandir o modelo para estimar os parametros de seleção não linear adicionando a) efeitos quadráticos de cada traço sobre a aptidão e b) uma interação entre os dois traços. Abaixo usamos novamente a escala observada dos traços, mas você pode usar unidades de desvio padrão, se preferir.
+
+```{r, eval = FALSE}
+nonlinear_sel<-lm(w~size+aggression+I(size*size)+I(aggression*aggression)+I(size*aggression), data=squirels)
+summary(nonlinear_sel)
+```
+
+Há muitos termos significativos aqui, então o que isso significa? Você consegue interpretá-los?
+
+Pode ser útil plotar a superfície de aptidão descrita por este modelo. Como a aptidão (predita) muda com diferentes combinações dos
+dois traços?
+
+```{r, eval = FALSE}
+library(ggplot2)
+
+grid <- expand.grid(
+  size = seq(min(squirels$size), max(squirels$size), length.out = 100),
+  aggression = seq(min(squirels$aggression), max(squirels$aggression), length.out = 100)
+)
+grid$w_pred <- predict(nonlinear_sel, newdata = grid)
+grid$w_pred <- as.numeric(grid$w_pred)
+ggplot(grid, aes(x = size, y = aggression, z = w_pred)) +
+  geom_contour_filled(bins = 30) +
+  geom_point(
+    data = squirels,
+    aes(x = size, y = aggression),
+    inherit.aes = FALSE,
+    shape = 16,
+    size = 1,
+    alpha = 0.6
+  ) +
+  labs(x = "size", y = "aggression", fill = "w (predita)") +
+  theme_minimal() + theme(legend.position = "none") 
+#zlim=c(0,5) #use this to get rid of areas where w<0 predicted
+```
