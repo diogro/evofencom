@@ -120,7 +120,9 @@ dt %>%
 
 ### 4. *Caracterização de variação em dimensionalidade alta*
 
-+ [Apresentação](Aulas/Quantificando variação multivariada.pdf)
++ [Apresentação: Variação Multivariada](Aulas/Quantificando variação multivariada.pdf)
++ [Apresentação: Modularidade](AulaAula_2_Modularity_Maio26.pdf)
+
 
 + Leituras principais:
 
