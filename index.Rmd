@@ -103,7 +103,7 @@ dt %>%
 
 ### 3. *Homologias, Caracteres e Mensurações* 
 
-+ [Apresentação](Aulas/Aula 3-HomologiaMensuracao.pdf)
++ [Apresentação](Aulas/Aula 3_Mensuracao.pdf)
 
 + Leituras principais:
 
@@ -120,7 +120,7 @@ dt %>%
 
 ### 4. *Caracterização de variação em dimensionalidade alta*
 
-+ [Apresentação: Variação Multivariada](Aulas/Quantificando variação multivariada.pdf)
++ [Apresentação: Variação Multivariada](Aulas/Quantificando_variaccao_multivariada.pdf)
 + [Apresentação: Modularidade](Aulas/Aula_2_Modularity_Maio26.pdf)
 
 
