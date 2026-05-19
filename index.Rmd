@@ -135,7 +135,7 @@ dt %>%
 
 ### 5. *Fenótipos moleculares, mapeamento genético, redes de co-expressão gênica*
 
-+ [Apresentação](Aulas/FenótiposMolecularesMapeamento.pdf)
++ [Apresentação](Aulas/FenotiposMolecularesMapeamento.pdf)
 
 + Leitura principal: 
 
