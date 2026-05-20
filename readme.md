@@ -202,9 +202,8 @@ Nature Ecology & Evolution, 7(8), 1181-1193.
 
 **Tutorial 5**: [*Modelos de Desempenho Funcional*](Tutoriais/selecao.html)
 
-**Tutorial 6**: [*Métodos Comparativos I*](Tutoriais/consequencias_evolutivas.html)
+**Tutorial 6**: [*Métodos Comparativos I*](Tutoriais/PCM_Intro_tutorial.R.html)
 
-**Tutorial 7**: [*Métodos Comparativos II*](Tutoriais/consequencias_evolutivas.html)
 
 # Shiny Apps
 
