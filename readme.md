@@ -202,7 +202,7 @@ Nature Ecology & Evolution, 7(8), 1181-1193.
 
 **Tutorial 5**: [*Modelos de Desempenho Funcional*](Tutoriais/selecao.html)
 
-**Tutorial 6**: [*Métodos Comparativos I*](Tutoriais/PCM_Intro_tutorial.R.html)
+**Tutorial 6**: [*Métodos Comparativos I*](https://raw.githubusercontent.com/diogro/evofencom/refs/heads/main/Tutoriais/PCM_Intro_tutorial.R)
 
 
 # Shiny Apps
