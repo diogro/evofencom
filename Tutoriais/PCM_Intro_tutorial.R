@@ -188,10 +188,7 @@ legend(x="bottomright",legend=levels(eco),cex=0.8,pch=21,
 #Consegue pensar em uma maneira de projetar a árvore em um espaço definido por mais de duas dimensões de componentes principais? 
 #Dica: consulte as páginas de ajuda das funções 'phylomorphospace3d' e 'phyloScattergram' para ter ideias, ou considere simplesmente subdividir a sua tela de plotagem usando o comando par(mfrow).
 
-#######################################
-###Vamos comparar agora PIC e PGLS?
-
-################################PICs and PGLS (Chapters 2 and 3)
+###Vamos testar correlações filogenéticas usando PGLS?
 
 library(phytools)
 
