@@ -1,0 +1,662 @@
+---
+title: "Tutorial for analyses done in 'Bridging performance and adaptive landscapes to understand long-term functional evolution'"
+author: "Monique N. Simon and Daniel S. Moen"
+date: "`r format(Sys.time(), '%d %B %Y')`"
+output: 
+  html_document:
+    toc: yes
+    theme: united
+    fig_width: 8
+    fig_height: 6
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(tidy.opts = list(width.cutoff = 75), tidy = TRUE) 
+```
+
+In this tutorial, you can reproduce the analyses performed in the paper 'Bridging performance and adaptive landscapes to understand long-term functional evolution'. Our main aim was to address whether aquatic and terrestrial lifestyles have influenced the location of performance and adaptive peaks for turtle shells.
+
+We re-analyzed turtle shell data collected by Stayton et al. (2018) for 237 species, the same data also used in Stayton (2019). We performed first the performance landscape approach (PLA, Part I), then the adaptive landscape approach (ALA, Part II), and finally the merged framework: comparing performance and adaptive peaks, then comparing species' phenotypes with inferred primary adaptive optima (Part III). 
+
+# R version and loading packages
+
+```{r packages, warning=FALSE,message=FALSE}
+
+R.Version()$version.string; R.Version()$platform
+
+library(metR)
+packageVersion('metR')
+library(geomorph)
+packageVersion('geomorph')
+library(phytools)
+packageVersion('phytools')
+library(ape)
+packageVersion('ape')
+library(tidyverse)
+packageVersion('tidyverse')
+library(ouch)
+packageVersion('ouch')
+library(ggplot2)
+packageVersion('ggplot2')
+library(viridis)
+packageVersion('viridis')
+library(phylolm)
+packageVersion('phylolm')
+
+```
+
+# Part I: Performance Landscape Approach (PLA)
+## Estimating the performance landscapes for stress, drag, and self-righting ability
+
+We will first read data provided by Stayton (2019) to construct a theoretical morphospace using the principal component (PC) axes that explain the most variance in the shape of turtle shells. Then, we will plot the performance surface for each function known to be relevant in turtle shells: breaking stress, drag, and self-righting ability. Stayton (2019) determined the association between PC scores and function using modeling and experiments.
+
+```{r theoretical morphospace}
+stayton_data <- read.csv('stayton_data.csv',header=TRUE)
+colnames(stayton_data) <- c('PC1','PC2','stress','drag','self.righting')
+head(stayton_data)
+
+plot(stayton_data$PC1,stayton_data$PC2,xlab='PC1',ylab='PC2', main='Theoretical morphospace')
+```
+
+To plot the performance surfaces, we will use the package *metR* that can create contour plots using the *ggplot* framework.
+
+```{r performance surfaces, warning=FALSE, message=FALSE}
+
+stress_contour <- ggplot(stayton_data,aes(PC1,PC2,z=stress)) +  
+  geom_contour_fill(breaks = MakeBreaks(binwidth = 15, exclude = 0)) +
+  scale_fill_divergent(breaks = MakeBreaks(binwidth = 15, exclude = 0)) + 
+  coord_equal() + 
+  theme_bw() + scale_fill_viridis() +
+  guides(fill=guide_legend(title="Stress")) +
+  theme(text = element_text(size=13, color='black'),
+        panel.grid.major = element_blank(), 
+        panel.grid.minor = element_blank(),
+        axis.text = element_text(size = 12, color='black'),
+        axis.title = element_text(size = 16, color='black'),
+        legend.text=element_text(size = 10),
+        legend.title = element_text(size = 12))
+stress_contour
+
+drag_contour <- ggplot(stayton_data,aes(PC1,PC2,z=drag)) + 
+  geom_contour_fill() +  
+  coord_equal() + 
+  theme_bw() + scale_fill_viridis() +
+  guides(fill=guide_legend(title="Drag")) +
+  theme(text = element_text(size=13, color='black'),
+        panel.grid.major = element_blank(), 
+        panel.grid.minor = element_blank(),
+        axis.text = element_text(size = 12, color='black'),
+        axis.title = element_text(size = 16, color='black'),
+        legend.text=element_text(size = 10),
+        legend.title = element_text(size = 12))
+drag_contour
+
+righting_contour <- ggplot(stayton_data,aes(PC1,PC2,z=self.righting)) + 
+  geom_contour_fill() +
+  coord_equal() + 
+  theme_bw() + scale_fill_viridis() +
+  guides(fill=guide_legend(title="Self righting")) +
+  theme(text = element_text(size=13, color='black'),
+        panel.grid.major = element_blank(), 
+        panel.grid.minor = element_blank(),
+        axis.text = element_text(size = 12, color='black'),
+        axis.title = element_text(size = 16, color='black'),
+        legend.text=element_text(size = 10),
+        legend.title = element_text(size = 12))
+righting_contour
+```
+
+With these performance surfaces, we can see the mapping of the shell phenotypes (PC scores) to performance on each of the three functions. Note that hotter colors actually indicate lower performance because they reflect higher stress, higher drag, and longer self-righting time. We can also confirm that these surfaces are the same as in Stayton (2019).
+
+## Estimating the combined performance landscapes for aquatic and terrestrial species
+
+We will now to estimate the combined performance landscape for terrestrial and aquatic species. To do this, we will first re-scale performance to range from 0 (minimum performance) to 1 (maximum performance), as described in Polly et al. (2016). We will also subtract from 1, such that greater values indicate better performance (hotter colors) in the combined landscapes (Stayton 2019). Then, we will use the average weights for stress, drag, and self-righting ability calculated for aquatic and terrestrial species, as reported in Stayton (2019). 
+
+```{r combined performance landscapes, warning=FALSE,message=FALSE}
+str(stayton_data)
+perf_rescaled <- as.data.frame(apply(stayton_data[,3:5],2,function(x) 
+  1 - ((x - min(x))/(max(x) - min(x)))))
+head(perf_rescaled)
+
+str(perf_rescaled)
+perf_aquatic <- (0.47*perf_rescaled$stress) + (0.38*perf_rescaled$drag) + 
+  (0.15*perf_rescaled$`self.righting`)
+combined_aquatic <- cbind(stayton_data[,1:2],perf_aquatic)
+
+perf_terrestrial <- (0.67*perf_rescaled$stress) + (0.18*perf_rescaled$drag) + 
+  (0.16*perf_rescaled$`self.righting`)
+
+# Combine datasets
+all_perf <- cbind(stayton_data[,1:2], perf_aquatic, perf_terrestrial) %>%
+  as_tibble() %>%
+  pivot_longer(cols = c(perf_aquatic, perf_terrestrial),
+               names_to = 'type', 
+               values_to = 'Performance') %>%
+  separate(col = 'type', into = c(NA, 'type'), sep = '_') %>%
+  mutate(type = factor(type), 
+         type = fct_recode(type, 
+                           'A. Combined aquatic landscape' = 'aquatic', 
+                           'B. Combined terrestrial landscape' = 'terrestrial'
+         )
+)
+all_perf
+
+# Color breaks
+min_perf <- round(min(all_perf$Performance),2)
+max_perf <- 1
+mybreaks <- seq.int(min_perf,max_perf,length.out = 12)
+
+# Plot together with facetting to put on same color scale
+all_perf %>%
+  ggplot(aes(PC1, PC2, z = Performance)) +  
+  geom_contour_filled(breaks = mybreaks) + 
+  coord_equal() + 
+  theme_bw() +   
+  guides(fill = guide_legend(title = "Performance")) +
+  theme(panel.grid.major = element_blank(), 
+        panel.grid.minor = element_blank(),
+        axis.text = element_text(size = 14, color = 'black'),
+        axis.title = element_text(size = 16, color = 'black'),
+        legend.text = element_text(size = 8),
+        legend.title = element_text(size = 10),
+        strip.text = element_text(size = 12, hjust = 0),
+        strip.background = element_blank()
+        ) +
+  facet_wrap(~type)
+
+
+```
+
+## Estimating the performance peaks for aquatic and terrestrial species
+
+With the combined landscapes, we can locate the performance peaks, that is, the PC scores that correspond to the highest performance. We will also calculate a region of high performance that is up to 5% lower than peak performance, to later compare with the 95% confidence intervals of inferred primary adaptive peaks using OU modeling (Table A1, available online).
+
+```{r performance peaks}
+combined_aquatic <- cbind(stayton_data[,1:2],perf_aquatic)
+colnames(combined_aquatic) <- c('PC1','PC2','perf_aquatic')
+
+max_comb_aquatic <- combined_aquatic[combined_aquatic$perf_aquatic== 
+                                       max(combined_aquatic$perf_aquatic),]
+max_comb_aquatic #aquatic performance peak
+
+max_comb_aquatic$perf_aquatic * 0.95 
+#region of 5% lower performance
+summary(combined_aquatic[which(combined_aquatic$perf_aquatic > 0.818),]) 
+
+combined_terrestrial <- cbind(stayton_data[,1:2],perf_terrestrial)
+colnames(combined_terrestrial) <- c('PC1','PC2','perf_terrestrial')
+
+max_comb_terrestrial <- combined_terrestrial[combined_terrestrial$perf_terrestrial== 
+                                               max(combined_terrestrial$perf_terrestrial),]
+max_comb_terrestrial #terrestrial performance peak
+
+max_comb_terrestrial$perf_terrestrial * 0.95 
+#region of 5% lower performance
+summary(combined_terrestrial[which(combined_terrestrial$perf_terrestrial > 0.859),]) 
+```
+We can see that the regions of 5% lower performance from the peak are quite large. They range from -0.125 to 0.025 for PC1 and -0.025 to 0.125 for PC2 in the aquatic combined landscape, and from -0.05 to 0.175 for PC1 and -0.025 to 0.100 for PC2 in the terrestrial combined landscape. 
+
+# Part II: Adaptive Landscape Approach (ALA)
+
+## Projecting species phenotypes in shape space 
+
+We will begin with the 53 three-dimensional landmarks placed on the shells of 274 species of turtles, provided by Stayton (2019). We will then perform a General Procrustes Analysis to project each species onto the PCs that reflect variation in shell shape. These PC axes are the same as the ones used to estimate performance landscapes. Note that we downloaded the original data from Dryad but corrected some misspellings in the names of some species.
+
+```{r shell shape PC scores,warning=FALSE,message=FALSE}
+
+turtle_data <- read.csv('turtle_data.csv',row.names=1) 
+length(levels(as.factor(turtle_data$Name))) 
+
+#Changing the data frame to an array
+turtle_array <- arrayspecs(turtle_data[,8:166],53,3,sep='')
+length(turtle_data$Name)
+dimnames(turtle_array)[[3]] <- turtle_data$Museum.Number 
+#had to put individuals names to get specimens' scores
+head(turtle_array[,,1]) 
+#53 landmarks (x, y, z) for the first specimen
+
+#Align all specimens with GPA
+proc_turtle <- gpagen(turtle_array)
+#shape variables
+
+#Perform a PCA analysis and get PCs scores of all specimens
+dimnames(proc_turtle$coords)[[3]] <- turtle_data$Museum.Number 
+proc_turtle_pca <- gm.prcomp(proc_turtle$coords)
+plot(proc_turtle_pca, main='PC scores for all specimens of turtles') 
+
+```
+
+From the plot above, we can confirm that the PCs we obtained are the same as the ones reported in Stayton (2019), because they explain the same amount of variance in shape.
+
+We will now calculate the average scores for each species, then use the consensus phylogeny from McLaughlin and Stayton (2016) to keep only the 237 species that we analyzed because they are present in this phylogeny. To do this, we will have to match the shape data with the tip labels in the phylogeny.
+
+```{r species scores on shape space}
+
+#Getting average scores per species
+proc_turtle_pca$x <- as.data.frame(proc_turtle_pca$x)
+specimens <- turtle_data$Name
+proc_turtle_pca$x$specimens <- specimens
+length(proc_turtle_pca$x$specimens)
+turtle_mean_pc <- aggregate(proc_turtle_pca$x[,1:2],by=list(proc_turtle_pca$x$specimens),mean)
+head(turtle_mean_pc)
+
+turtle_tree <- read.tree('turtle_tree.tre')
+turtle_tree  #using consensus tree already pruned to have the 237 species
+
+##Need to match species data with species phylogeny
+which(is.na(match(levels(as.factor(turtle_data$Name)),turtle_tree$tip.label))) 
+#species of turtle data that are not in the phylogeny (n=37) 
+
+#Now exclude the extra species to have n=237
+species <- turtle_tree$tip.label
+#Adding species names again now that some names in the data have been changed
+specimens <- turtle_data$Name
+proc_turtle_pca$x$specimens <- specimens
+length(proc_turtle_pca$x$specimens)
+turtle_mean_pc <- aggregate(proc_turtle_pca$x[,1:2],by=list(proc_turtle_pca$x$specimens),mean)
+str(turtle_mean_pc) #274 species
+#Removing extra specimens
+proc_turtle_pca$x <- proc_turtle_pca$x[-c(which(is.na(match(proc_turtle_pca$x$specimens,species)))),]
+#calculating means again using only specimens that correspond to the 237 species we will analyze:
+turtle_mean_pc.1 <- aggregate(proc_turtle_pca$x[,1:2],by=list(proc_turtle_pca$x$specimens),mean)
+length(levels(as.factor(proc_turtle_pca$x$specimens))) #237
+
+##Multiplying all pc1 scores by -1.Signs flipped when comparing with Stayton (2019)
+turtle_mean_pc.1$Comp1 = turtle_mean_pc.1$Comp1 * -1
+
+#Include habitat info
+turtle_data_clean <- turtle_data[-c(which(is.na(match(turtle_data$Name,species)))),] 
+habitat <- (aggregate(turtle_data_clean$Habitat,by=list(turtle_data_clean$Name,
+                             turtle_data_clean$Habitat), function(x) x))[,1:2]
+#it is alphabetic order per habitat: change to alphabetic order to match species
+habitat.1 <- as.data.frame(habitat[order(habitat$Group.1),])
+#substitute "A" and "T" by colors blue and brown
+habitat.1[c(which(habitat.1$Group.2=='A')),2] = 'blue'
+habitat.1[c(which(habitat.1$Group.2=='T')),2] = 'brown'
+
+plot(turtle_mean_pc.1$Comp1,turtle_mean_pc.1$Comp2,pch=21,bg=habitat.1$Group.2,
+     xlab='PC1 (21.9%)',ylab="PC2 (10.6%)")
+legend("topright", pch=21, pt.bg = unique(habitat.1$Group.2), 
+       legend = c('aquatic','terrestrial'), box.lty = 0 )
+```
+
+The plot above shows the average scores for the 237 species we will analyze, separated into aquatic and terrestrial habitats.
+
+## Estimating ancestral states
+
+Now we will create a data frame with all the information we need to reconstruct ancestral states of habitat, to then use them in the OU modeling using the R package *ouch*. From now on, we will run analyses using several functions created in previous work by one of us. These functions are provided in the 'R_functions_PBZ.R' script as supplementary material. The phylogeny with the reconstructed ancestral states is presented in Fig. A1 of the online appendix.
+
+```{r ancestral states, warning = FALSE}
+
+#Joining habitat info with PC scores
+habitat.1 <- as.data.frame(habitat[order(habitat$Group.1),])
+turtle_dat <- cbind(habitat.1,turtle_mean_pc.1[,2:3])
+
+#putting in the same order as the phylogeny
+turtle_dat<- turtle_dat[match(turtle_tree$tip.label, turtle_dat$Group.1), ]
+colnames(turtle_dat) <- c('Species','Habitat','PC1','PC2')
+
+#Reconstructing ancestral states with ace
+head(turtle_dat)
+states_ou <- setNames(turtle_dat$Habitat, turtle_dat$Species)
+# Put the data in the same order as the phylogeny
+states_ou <- states_ou[turtle_tree$tip.label]
+
+aic_ER <- AIC(ace(states_ou, turtle_tree, type='discrete',model='ER')) 
+aic_ER
+aic_ARD <- AIC(ace(states_ou, turtle_tree, type='discrete',model='ARD'))
+aic_ARD
+
+#Calculating AIC weights
+source('R_functions_PBZ.R')
+aic_list <- list('ER'= aic_ER,'ARD'= aic_ARD)
+aicc_wgt_calc(unlist(aic_list)) 
+#function to calculate AICc weights
+
+anc_states <- ace(states_ou, turtle_tree, type='discrete',model='ER')
+anc_states$rates 
+head(anc_states$lik.anc) 
+#use this as internal states
+
+#vector of ancestral states (get states with higher support for each node)
+turtle_tree$Nnode 
+x = anc_states$lik.anc[,1] > 0.51  #higher support for A (TRUE)
+length(anc_states$lik.anc[,1][x]) #178 nodes aquatic
+y = anc_states$lik.anc[,2] > 0.51  #higher support for T (TRUE)
+length(anc_states$lik.anc[,2][y]) #58 nodes terrestrial
+
+head(anc_states$lik.anc[,1][x]) 
+#names are nodes and numbers are support for A
+#replace support for letter A
+str(anc_states$lik.anc[,1][x])
+as.numeric(names(anc_states$lik.anc[,1][x]))
+nodes.1 = c(rep("A",178))
+nodes.2 = c(rep('T',58))
+nodes_states <- c(nodes.1,nodes.2)
+nodes_names <- c(as.numeric(names(anc_states$lik.anc[,1][x])),
+                 as.numeric(names(anc_states$lik.anc[,2][y])))
+node_states <- nodes_states[order(nodes_names)]
+
+##Internal states in the phylogeny
+turtle_tree$node.label = node_states
+turtle_tree 
+```
+
+We can now see that the object `turtle_tree` has node labels (A for aquatic, and T for terrestrial).
+
+## Comparing models of phenotypic evolution
+
+The next step is to set up the data frame to be used in *ouch*, so that we can compare different multivariate models: Brownian motion, single optimum Ornstein-Uhlenbeck (OU), and 2-peak OU (aquatic and terrestrial).
+
+```{r OU modeling}
+##Set up data for ouch
+source('R_functions_PBZ.R') 
+
+turtle_ouch_OU2 <- data.frame(turtle_dat[,2:4]) 
+rownames(turtle_ouch_OU2) <- turtle_dat$Species
+
+# Now we add the phylogeny and internal-state estimates
+head(rownames(turtle_ouch_OU2) == turtle_tree$tip.label) #true
+turtle_ouch_OU2 <- divers_to_ouch(turtle_tree, turtle_tree$node.label, turtle_ouch_OU2) #function to construct the data frame to use in 'ouch' analyses
+max(node.depth.edgelength(turtle_tree)) #length of phylogeny = 227.77 mya
+
+#Plotting the internal states
+ouch_tree <- with(turtle_ouch_OU2, ouchtree(nodes, ancestors, times, labels)) 
+plot(ouch_tree, regimes = turtle_ouch_OU2['model'],palette=c('blue','brown'),
+     margin=0.15,labels=TRUE) 
+#different colors represent different selective regimes
+
+# Set ouchtree for all analyses
+ouch_tree <- with(turtle_ouch_OU2, ouchtree(nodes, ancestors, times, labels))
+
+##OUCH analysis: comparing multivariate models
+# (a) Brownian motion for PC1 and PC2 scores at once
+brown_ouch_turtle <- brown(turtle_ouch_OU2[c('PC1','PC2')], ouch_tree)
+
+# (b) Single-optimum OU 
+set.seed(10) #setting seed so that analysis can be reproduced
+
+turtle_ouch_OU2$global <- as.factor('global') # Set single regime for OU1
+OU1_ouch_turtle <- hansen(turtle_ouch_OU2[c('PC1','PC2')], ouch_tree, regimes = turtle_ouch_OU2['global'],
+                          sqrt.alpha = c(1,0,1), sigma = c(1,0,1),maxit=1000)
+
+# (c) Two optima OU2: changed sigma values to closer to 0 to converge better
+OU2_ouch_turtle <- hansen(turtle_ouch_OU2[c('PC1','PC2')], ouch_tree, regimes = turtle_ouch_OU2['model'],
+                          sqrt.alpha = c(2,0,2), sigma = c(0.001,0,0.001), maxit=1000)
+
+# Put output objects into a list to more easily summarize results
+all_out <- list(brown_ouch_turtle, OU1_ouch_turtle, OU2_ouch_turtle)
+names(all_out) <- c('BM', 'OU1', 'OU2')
+
+# Summarize model fits
+ouch_sum <- map(all_out, summary)
+turtle_fits <- tibble(model = names(all_out),
+                      k = map_dbl(ouch_sum, ~.$dof),
+                      loglik = map_dbl(ouch_sum, ~.$loglik),
+                      AICc = map_dbl(ouch_sum, ~.$aic.c),
+                      wgt = aicc_wgt_calc(AICc))
+turtle_fits 
+```
+
+From the table above, we can conclude that the most-supported model is the 2-peak OU model, describing two divergent optima for aquatic and terrestrial turtles. We can now move forward and apply the merged framework to the turtle shell phenotypes.
+
+# Part III: Merged framework
+## Estimating adaptive peaks and 95% confidence intervals using bootstrapping
+
+We will first calculate 95% confidence intervals for the OU model parameters we just inferred for aquatic and terrestrial species. We can do this by performing a parametric bootstrap analysis using the *ouch* package.
+
+```{r OU bootstrap,warning=FALSE,message=FALSE}
+
+#adaptive peaks for aquatic and terrestrial species
+ouch_sum$OU2$optima 
+
+boot_OU2 <- bootstrap(OU2_ouch_turtle,nboot=3) 
+#increase nboot=1000 to get similar results as the paper (Table A1), minus slight differences due to the random aspects of simulation
+boot_CI <- t(sapply(boot_OU2,quantile,probs=c(0.025,0.975)))
+head(boot_CI)
+```
+
+## Comparing performance and adaptive peaks
+
+Now we can compare the locations of performance peaks (point estimate and region of 5% lower highest performance) and the 95% CI of adaptive peaks. This comparison is shown in Table A1 when running 1,000 bootstrap iterations and in Figure 2 of our paper.
+
+```{r performance and adaptive peaks comparison}
+
+#95% CI of aquatic adaptive peak
+boot_CI[c(9,11),] 
+#95% CI of terrestrial adaptive peak
+boot_CI[c(10,12),] 
+
+#point estimates of performance peaks
+max_comb_aquatic
+max_comb_terrestrial
+
+#min and max PC scores of the region with 5% lower performance
+summary(combined_aquatic[which(combined_aquatic$perf_aquatic > 0.818),])  
+summary(combined_terrestrial[which(combined_terrestrial$perf_terrestrial > 0.859),])
+```
+
+With the 1,000 iterations, we would see that the point estimate for the aquatic performance peak matches the 95% CI of the adaptive peak, but this is not the case for the terrestrial performance peak. However, when considering the region of 5% lower performance from the peak, the performance and adaptive peaks do overlap for terrestrial species.
+
+## Comparing species phenotypes with adaptive peaks 
+
+The next step in the merged framework is to calculate the distances of species' phenotypes to the inferred adaptive peaks. We will first reproduce Figure 3A here to plot all species' phenotypes and the aquatic and terrestrial adaptive peaks.
+
+### Figure 3A: Species' phenotypes and adaptive peaks
+
+```{r species phenotypes and adaptive peaks}
+Fig.3A <- ggplot(turtle_dat, aes(x=PC1,y=PC2,fill=Habitat, shape = Habitat)) + 
+  geom_point(size=2, color = 'black') + 
+  scale_shape_manual(values = c(21, 24)) +
+  scale_fill_manual(values=c('gray70','black')) +
+  scale_x_continuous(name = 'PC1 (21.9%)', breaks = seq(-0.1, 0.15, 0.05)) + 
+  scale_y_continuous(name = 'PC2 (10.6%)', breaks = seq(-0.1, 0.15, 0.05)) +
+  coord_fixed() + 
+  theme_bw() +
+  theme(text = element_text(size=13, color='black'),
+        panel.grid.major = element_blank(), 
+        panel.grid.minor = element_blank(),
+        axis.text = element_text(size = 12, color='black'),
+        axis.title = element_text(size = 16, color='black'),
+        legend.position=c(0.9,0.85),
+        legend.text=element_text(size = 10),
+        legend.title = element_text(size = 12),
+        legend.background = element_rect(fill = "white", color = 'black') 
+        )
+  
+#Adding the adaptive peaks
+
+PC1 <- c(-0.041,0.076)
+PC2 <- c(0.008,-0.0139)
+Habitat <- c('A','T','A','T')
+opt_df <- data.frame(PC1,PC2,Habitat)
+
+Fig.3A_final <- Fig.3A + 
+  geom_point(data=opt_df, aes(x=PC1,y=PC2,fill=Habitat), shape=21, size=6) 
+
+Fig.3A_final
+```
+
+From the plot above, we can see that several species' phenotypes are far from the adaptive peak of their current environment. We can also see that some terrestrial species are closer to the aquatic adaptive peak than to their own peak. This suggests that some terrestrial lineages have only recently changed from an aquatic ancestral environment to the terrestrial environment (as can be seen in Fig. A2)
+
+## Testing for the effect of historical versus species-specific factors on phenotypic variation
+
+We can now test for the effects of historical factors versus species-specific factors on phenotypic variation. We expect a high proportion of variation explained by history for lineages that changed environments more recently (i.e., terrestrial lineages). 
+
+We will perform this test separately for aquatic and terrestrial species, first including the family Testudinidae and then excluding this family. Results of these tests are shown in Table 2 of our paper.
+
+```{r history vs species-specific factors}
+
+source('R_functions_PBZ.R') 
+turtle_optima <- t(as.data.frame(ouch_sum$OU2$optima))
+turtle_optima
+
+#Separating aquatic and terrestrial lineages
+#aquatic: 
+aquatic_dat <- turtle_dat[turtle_dat$Habitat=='A',2:4]
+aquatic_opt <- as.data.frame(turtle_optima[,1])
+colnames(aquatic_opt) <- 'A'
+hist_test_A <- history.test(aquatic_dat,aquatic_opt,c('PC1','PC2')) 
+#function to run the test of historical vs species-specific factors
+hist_test_A
+
+#terrestrial
+terrestrial_dat <- turtle_dat[turtle_dat$Habitat=='T',2:4]
+terrestrial_opt <- as.data.frame(turtle_optima[,2])
+colnames(terrestrial_opt) <- 'T'
+hist_test_T <- history.test(terrestrial_dat,terrestrial_opt,c('PC1','PC2'))
+hist_test_T
+
+#terrestrial excluding Testudinidae
+turtle_dat.1 <- turtle_dat[-c(115,99,100,109,105,106,110,111,104,107,108,137:140,
+                              102,103,114,124,129:131,116:123,136,141,142,125:127,
+                              112,113,101,128,132:135),]
+terrestrial_dat.1 <- turtle_dat.1[turtle_dat.1$Habitat=='T',2:4] #n=24
+hist_test_T.1 <- history.test(terrestrial_dat.1,terrestrial_opt,c('PC1','PC2')) 
+hist_test_T.1 
+```
+
+From the results above, we can see that the proportion of phenotypic variation explained by history is only high for terrestrial species when removing Testudinidae. This is because Testudinidae lineages have spent more time in their current environment compared with other terrestrial lineages.
+
+For aquatic lineages, much more phenotypic variation is explained by species-specific factors, such as other (untested) ecological factors and genetic constraints.
+
+## Testing the effect of time spent in current environment on species' deviations from the adaptive peak
+
+We can now specifically test if lineages that have spent less time in their current environment show a higher deviation from their adaptive peak. To do this, we will perform a phylogenetic generalized least-squares (PGLS) regression of distance from optimum on time spent in current environment.
+
+```{r multivariate PGLS}
+
+## Make node list (i.e., nodes where changes in microhabitat occurred; determined in advance)
+# Note that these are class 'phylo' node orders, NOT 'ouch' order
+# Jump intermediary nodes and associate descendants arising from the node that changed
+#Node 274 that originates Testudnidae: use Aldabrachelys, Astrochelys, Centrochelys, Chelonoidis, Chersina, 
+#Geochelone, Gopherus, Homopus, Indotestudo, Kinixys, Malachocersus, Manouria, Psammobates, 
+#Pyxis, Stigmochelys, Testudo
+nodes <- c(286,280,298,320,329,327,315,334,275,274,388,390,384,450) #13 changes of environment
+name.list <- list('Cuora_mouhotii',c('Cuora_mccordi','Cuora_picturata','Cuora_bourreti',
+                                     'Cuora_galbinifrons','Cuora_flavomarginata'),
+                  'Vijayachelys_silvatica',
+                  'Leucocephalon_yuwonoi','Heosemys_depressa', 'Heosemys_spinosa',
+                  c('Geoemyda_japonica','Geoemyda_spengleri'),
+                  c('Rhinoclemmys_funerea','Rhinoclemmys_melanosterna',
+                    'Rhinoclemmys_punctularia','Rhinoclemmys_diademata'),
+                  c('Rhinoclemmys_areolata','Rhinoclemmys_nasuta','Rhinoclemmys_rubida',
+                    'Rhinoclemmys_annulata','Rhinoclemmys_pulcherrima'),
+                  c('Aldabrachelys','Astrochelys','Centrochelys','Chelonoidis','Chersina',
+                    'Geochelone','Gopherus','Homopus',
+                  'Indotestudo','Kinixys','Malacochersus','Manouria','Psammobates','Pyxis',
+                  'Stigmochelys','Testudo'),
+                  c('Terrapene_mexicana','Terrapene_carolina','Terrapene_ornata',
+                    'Terrapene_nelsoni'),'Terrapene_coahuila',
+                  c('Glyptemys_muhlenbergii','Glyptemys_insculpta'),'Platemys_platycephala')
+                                                                                                                              
+
+#Get habitat states for all species
+habitat <- turtle_dat$Habitat
+names(habitat) <- turtle_dat$Species
+
+age.mat <- as.data.frame(matrix(nrow=length(turtle_tree$tip.label), ncol=2))
+rownames(age.mat) <- turtle_dat$Species
+age.mat[,2] <- "A" 
+#just to start filling in the habitats
+
+for (i in seq(nodes)){
+  foo <- age.regime(x=nodes[i], tr=turtle_tree, name=name.list[[i]], dat=habitat, check.regimes=FALSE)
+  age.mat[rownames(foo),] <- foo
+}
+age.mat[,2] <- as.factor(age.mat[,2])
+all(age.mat[,2] == habitat) #TRUE
+
+levels(as.factor(age.mat$V1)) 
+#14 different time lengths for aquatic lineages that switched to terrestrial 
+#or secondary transitions from terrestrial back to aquatic
+
+##Now calculating the multivariate distance from optima
+turtle_optima <- as.data.frame(ouch_sum$OU2$optima)
+turtle_optima 
+#use it like this for arg optima
+turtle_data <- turtle_dat[,2:4]
+
+# Use it
+distances <- dist.from.opt(dat=turtle_data, model='Habitat', 
+                           optima=turtle_optima, cont.char=paste0("PC",1:2))
+#function to calculate species' phenotypes distances
+head(distances)
+# Append to previous matrix
+age.mat$dist <- distances
+age.mat <- age.mat[,c(1,3,2)]
+colnames(age.mat) <- c("time","dist","habitat")
+
+# Remove all aquatic taxa that have a history of 100% water(they have 'NA' for time values)
+age.mat <- age.mat[complete.cases(age.mat),]
+red.tr 	<- drop.tip(turtle_tree,name.check(turtle_tree,age.mat)$tree_not_data)
+
+age.mat <- age.mat[red.tr$tip.label,]
+#rownames(age.mat) == red.tr$tip.label #TRUE
+
+##Using BM with phylolm package 
+head(age.mat)
+log.dat <- cbind('time'= log(age.mat[,1]), age.mat[,2:3])
+#Need to use absolute distances
+head(log.dat$dist)
+#data frame must have row names
+
+phy.log.lm <- summary(phylolm(dist ~ time,log.dat,red.tr,model = 'BM'))
+phy.log.lm
+
+#Same test excluding Testudinidae
+
+#Excluding Testudinidae: only include rows that have time < 59
+age.mat.1 <- age.mat[age.mat$time < 59,] #n=29
+
+log.dat.1 <- cbind('time'= log(age.mat.1[,1]), age.mat.1[,2:3])
+phy.log.lm.1 <- summary(phylolm(dist ~ time,log.dat.1,red.tr,model = 'BM'))
+phy.log.lm.1
+```
+
+We can see from the results above that variation in distance from the optimum is not explained by time spent in current environment, even when excluding Testudinidae. These results are shown in Table A2 for multivariate distances.
+
+### Figure 3B: PGLS of time spent in current environment on distance from optimum
+
+We can plot these results as shown in Figure 3B of the paper.
+
+```{r Figure 3B}
+
+#plot in log scale but use original time as labels in axis
+colnames(age.mat)[3] <- 'Habitat'
+
+Fig.3B <- ggplot(data=age.mat,
+                 aes(x=time, y=dist, fill = Habitat, shape = Habitat, size = Habitat)) + 
+  geom_point(color = 'black') + 
+  scale_size_manual(values = c(4, 3)) +
+  scale_shape_manual(values = c(21, 24)) + 
+  scale_x_continuous(trans='log', breaks = c(7,14,28,56)) +
+  scale_fill_manual(values=c('gray70','black')) +
+  labs(x="Time in current environment (mya)", y = 'Multivariate distance to optimum') + 
+  ylim(0,0.15) +
+  theme_bw() + 
+  theme(text = element_text(size=15),
+        panel.grid.major = element_blank(), 
+        panel.grid.minor = element_blank(),
+        axis.text = element_text(size = 12, color='black'),
+        axis.title = element_text(size = 16, color='black'),
+        legend.position="none"
+        )
+        
+Fig.3B
+```
+
+# Conclusion
+
+From all the analyses performed, we can conclude that performance and adaptive peaks match for turtle shells, indicating that the three functions measured (stress, drag, and self-righting ability) are relevant for fitness. Moreover, stress has a higher weight for terrestrial species and the same is true for drag for aquatic species, as one might expect. We can also infer that most species' phenotypes deviate from inferred adaptive peaks, but probably because of constraints that are not generally related to an influence of past adaptation to ancestral environments.
+
+# References
+
+McLaughlin C.J. and C.T. Stayton. 2016. Convergent evolution provides evidence of similar radiations in shell shape in the turtle families Emydidae and Geoemydidae. Herpetologica 72:120–129.
+
+Polly P.D., C.T. Stayton, E.R. Dumont, S.E. Pierce, E.J. Rayfield, and K.D. Angielczyk. 2016. Combining geometric morphometrics and finite element analysis with evolutionary modeling: towards a synthesis. J. Vertebr. Paleontol. 36:e1111225.
+
+Stayton C.T. 2019. Performance in three shell functions predicts the phenotypic distribution of hard‐shelled turtles. Evolution 73:720–734.
+
+Stayton C.T., L.F. O'Connor and N.M. Nisivoccia. 2018. The influence of multiple functional demands on morphological diversification: a test on turtle shells. Evolution 72:1933–1949.
