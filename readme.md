@@ -1,6 +1,5 @@
-# "**5925935** - *Evolução de Fenótipos Complexos*"
 
-# Preliminares
+# **5925935** - *Evolução de Fenótipos Complexos*
 
 ## R
 
@@ -29,12 +28,13 @@ O link "Atividades Preparatórias" oferece um introdução da linguagem.
 
 [Apostila de biologia evolutiva](https://github.com/lem-usp/apostila-bio-evol/blob/master/apostila-Bio312.pdf?raw=true)
 
+# Cronograma
 
 # Aulas Teóricas
 
 ### 1. Origem, manutenção e organização de variação fenotípica e genética
 
-+ [Apresentação](Aulas/Historico.pdf)
++ [Apresentação](Aulas/Aula_1_variation_Maio26.pdf)
 
 + Leitura principal:
    
@@ -62,7 +62,7 @@ O link "Atividades Preparatórias" oferece um introdução da linguagem.
 
 ### 3. *Homologias, Caracteres e Mensurações* 
 
-+ [Apresentação](Aulas/Aula3_Mensuração.pdf).
++ [Apresentação](Aulas/Aula 3_Mensuracao.pdf)
 
 + Leituras principais:
 
@@ -79,7 +79,9 @@ O link "Atividades Preparatórias" oferece um introdução da linguagem.
 
 ### 4. *Caracterização de variação em dimensionalidade alta*
 
-+ [Apresentação](Aulas/Quantificando variação multivariada.pdf)
++ [Apresentação: Variação Multivariada](Aulas/Quantificando_variaccao_multivariada.pdf)
++ [Apresentação: Modularidade](Aulas/Aula_2_Modularity_Maio26.pdf)
+
 
 + Leituras principais:
 
@@ -92,7 +94,7 @@ O link "Atividades Preparatórias" oferece um introdução da linguagem.
 
 ### 5. *Fenótipos moleculares, mapeamento genético, redes de co-expressão gênica*
 
-+ [Apresentação](Aulas/fenotipos_moleculares.pdf)
++ [Apresentação](Aulas/FenotiposMolecularesMapeamento.pdf)
 
 + Leitura principal: 
 
@@ -107,7 +109,7 @@ O link "Atividades Preparatórias" oferece um introdução da linguagem.
 
 ### 6. *Paisagem adaptativa fenotípica e seleção natural*
 
-+ [Apresentação](Aulas/deteccao_modularidade.pdf)
++ [Apresentação](Aulas/SelecaoVariacao.pdf)
 
 + Leituras Principais
 
@@ -123,7 +125,7 @@ O link "Atividades Preparatórias" oferece um introdução da linguagem.
 
 ### 7. *Fenótipos complexos e função*
 
-+ [Apresentação](Aulas/paisagem_adaptativa.pdf)
++ [Apresentação](Aulas/superficie_performance.pdf)
 
 + Leituras principais:
 
@@ -134,7 +136,7 @@ O link "Atividades Preparatórias" oferece um introdução da linguagem.
 
 ### 8. *Evolução de médias fenotípicas I: Introdução aos métodos comparativos filogenéticos*
 
-+ [Apresentação](Aulas/)
++ [Apresentação](Aulas/Aula8.pdf)
 
 + Leituras principais:
 
@@ -198,11 +200,11 @@ Nature Ecology & Evolution, 7(8), 1181-1193.
 
 **Tutorial 3.3**: [*Modelos animal bivariado*](Tutoriais/modelo_animal_multi.html)
 
-**Tutorial 4**: [*Estimando Seleção*](Tutoriais/detectando_modularidade.html)
+**Tutorial 4**: [*Estimando Seleção*](Tutoriais/estimando_selecao.html)
 
-**Tutorial 5**: [*Modelos de Desempenho Funcional*](Tutoriais/selecao.html)
+**Tutorial 5**: [*Modelos de Desempenho Funcional*](Tutoriais/Simon_and_Moen_PBZ_analyses.html)
 
-**Tutorial 6**: [*Métodos Comparativos I*](https://raw.githubusercontent.com/diogro/evofencom/refs/heads/main/Tutoriais/PCM_Intro_tutorial.R)
+**Tutorial 6**: [*Métodos Comparativos*](https://raw.githubusercontent.com/diogro/evofencom/refs/heads/main/Tutoriais/PCM_Intro_tutorial.R)
 
 
 # Shiny Apps
