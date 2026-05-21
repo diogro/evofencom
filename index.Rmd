@@ -166,7 +166,7 @@ dt %>%
 
 ### 7. *Fenótipos complexos e função*
 
-+ [Apresentação](Aulas/paisagem_adaptativa.pdf)
++ [Apresentação](Aulas/Aula_3_performance.pdf)
 
 + Leituras principais:
 
@@ -243,7 +243,7 @@ Nature Ecology & Evolution, 7(8), 1181-1193.
 
 **Tutorial 4**: [*Estimando Seleção*](Tutoriais/estimando_selecao.html)
 
-**Tutorial 5**: [*Modelos de Desempenho Funcional*](Tutoriais/selecao.html)
+**Tutorial 5**: [*Modelos de Desempenho Funcional*](Tutoriais/Simon_and_Moen_PBZ_analyses.html)
 
 **Tutorial 6**: [*Métodos Comparativos*](https://raw.githubusercontent.com/diogro/evofencom/refs/heads/main/Tutoriais/PCM_Intro_tutorial.R)
 
